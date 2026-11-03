@@ -13,7 +13,7 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Accept Android SDK Licenses
+    - name: Accept Android Licenses
       run: |
         mkdir -p $ANDROID_HOME/licenses
         echo -e "\n8933bad161af420fb4fb7fb3edec8f0b7f3cdc7d" > $ANDROID_HOME/licenses/android-sdk-license
@@ -22,11 +22,17 @@ jobs:
     - name: Install Bubblewrap
       run: npm install -g @bubblewrap/cli
 
+    - name: Generate Keystore
+      run: |
+        keytool -genkey -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass password -keypass password -dname "CN=Android,O=Android,C=US"
+
     - name: Init and Build
       run: |
-        yes | bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
+        # Обманка для интерактивного режима
+        script -q -c "yes | bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation" /dev/null
         cd android
-        yes | bubblewrap build --skipPwaValidation
+        # Сборка с нашим сгенерированным ключом
+        bubblewrap build --skipPwaValidation --signingKeyPath=../android.keystore --signingKeyAlias=android --signingKeyPassword=password
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
