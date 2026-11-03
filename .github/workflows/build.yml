@@ -1,5 +1,7 @@
 name: Build APK
 on: push
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,14 +15,15 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Accept Android Licenses
+    - name: Install Android SDK Packages
       run: |
         yes | sdkmanager --licenses || true
+        sdkmanager "platforms;android-34" "build-tools;34.0.0" || true
 
     - name: Install Bubblewrap
       run: npm install -g @bubblewrap/cli
 
-    - name: Configure Bubblewrap Config
+    - name: Configure Bubblewrap
       run: |
         mkdir -p ~/.bubblewrap
         echo '{"jdkPath":"'"$JAVA_HOME"'","androidSdkPath":"'"$ANDROID_HOME"'"}' > ~/.bubblewrap/config.json
