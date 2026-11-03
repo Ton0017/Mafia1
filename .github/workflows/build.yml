@@ -20,6 +20,11 @@ jobs:
     - name: Install Bubblewrap
       run: npm install -g @bubblewrap/cli
 
+    - name: Configure Bubblewrap
+      run: |
+        mkdir -p ~/.bubblewrap
+        echo '{"jdkPath":"'"$JAVA_HOME"'","androidSdkPath":"'"$ANDROID_HOME"'"}' > ~/.bubblewrap/config.json
+
     - name: Generate Keystore
       run: |
         keytool -genkey -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=Android,O=Android,C=US"
@@ -65,6 +70,7 @@ jobs:
         BUBBLEWRAP_KEYSTORE_PASSWORD: password123
         BUBBLEWRAP_KEY_PASSWORD: password123
       run: |
+        export PATH="$JAVA_HOME/bin:$PATH"
         cd android
         bubblewrap build --skipPwaValidation
 
