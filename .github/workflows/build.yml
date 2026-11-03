@@ -81,8 +81,8 @@ jobs:
       run: |
         export PATH="$JAVA_HOME/bin:$PATH"
         cd android
-        # Автоматически отвечаем "n" на вопрос про регенерацию
-        echo "n" | bubblewrap build --skipPwaValidation
+        # Создаем фейковый TTY и автоматически отвечаем "y" (Да) на вопрос про регенерацию
+        script -q -c "bubblewrap build --skipPwaValidation" /dev/null <<< "y"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
