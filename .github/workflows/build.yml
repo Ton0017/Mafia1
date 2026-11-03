@@ -15,29 +15,58 @@ jobs:
 
     - name: Accept Android Licenses
       run: |
-        mkdir -p $ANDROID_HOME/licenses
-        echo -e "\n8933bad161af420fb4fb7fb3edec8f0b7f3cdc7d" > $ANDROID_HOME/licenses/android-sdk-license
-        echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_HOME/licenses/android-sdk-preview-license
+        yes | sdkmanager --licenses || true
 
     - name: Install Bubblewrap
       run: npm install -g @bubblewrap/cli
-
-    - name: Configure Bubblewrap Paths
-      run: |
-        bubblewrap updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_HOME"
 
     - name: Generate Keystore
       run: |
         keytool -genkey -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=Android,O=Android,C=US"
 
-    - name: Init and Build
+    - name: Create TWA Manifest
+      run: |
+        mkdir -p android
+        cat > android/twa-manifest.json << 'EOF'
+        {
+          "packageId": "io.github.ton0017.mafia",
+          "host": "ton0017.github.io",
+          "name": "City of Noir",
+          "launcherName": "Noir",
+          "display": "fullscreen",
+          "themeColor": "#000000",
+          "navigationColor": "#000000",
+          "backgroundColor": "#0a0a0a",
+          "startUrl": "/Mafia1/",
+          "iconUrl": "https://ton0017.github.io/Mafia1/assets/icons/icon-512.png",
+          "maskableIconUrl": "https://ton0017.github.io/Mafia1/assets/icons/icon-512.png",
+          "appVersionName": "1.0.0",
+          "appVersionCode": 1,
+          "shortcuts": [],
+          "signingKey": {
+            "path": "../android.keystore",
+            "alias": "android"
+          },
+          "generatorApp": "bubblewrap-cli",
+          "webManifestUrl": "https://ton0017.github.io/Mafia1/manifest.json",
+          "fallbackType": "customtabs",
+          "features": {},
+          "alphaDependencies": {
+            "enabled": false
+          },
+          "enableNotifications": false,
+          "isChromeOS": false,
+          "useBrowser": false
+        }
+        EOF
+
+    - name: Build APK
       env:
         BUBBLEWRAP_KEYSTORE_PASSWORD: password123
         BUBBLEWRAP_KEY_PASSWORD: password123
       run: |
-        bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
         cd android
-        bubblewrap build --skipPwaValidation --signingKeyPath=../android.keystore --signingKeyAlias=android
+        bubblewrap build --skipPwaValidation
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
