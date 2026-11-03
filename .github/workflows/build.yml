@@ -22,17 +22,22 @@ jobs:
     - name: Install Bubblewrap
       run: npm install -g @bubblewrap/cli
 
+    - name: Configure Bubblewrap Paths
+      run: |
+        bubblewrap updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_HOME"
+
     - name: Generate Keystore
       run: |
-        keytool -genkey -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass password -keypass password -dname "CN=Android,O=Android,C=US"
+        keytool -genkey -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=Android,O=Android,C=US"
 
     - name: Init and Build
+      env:
+        BUBBLEWRAP_KEYSTORE_PASSWORD: password123
+        BUBBLEWRAP_KEY_PASSWORD: password123
       run: |
-        # Обманка для интерактивного режима
-        script -q -c "yes | bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation" /dev/null
+        bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
         cd android
-        # Сборка с нашим сгенерированным ключом
-        bubblewrap build --skipPwaValidation --signingKeyPath=../android.keystore --signingKeyAlias=android --signingKeyPassword=password
+        bubblewrap build --skipPwaValidation --signingKeyPath=../android.keystore --signingKeyAlias=android
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
