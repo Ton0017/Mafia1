@@ -26,8 +26,10 @@ jobs:
         yes | sdkmanager --licenses || true
         sdkmanager "platforms;android-34" "build-tools;34.0.0" || true
 
-    - name: Install Bubblewrap
-      run: npm install -g @bubblewrap/cli
+    - name: Install Dependencies (Bubblewrap + Expect)
+      run: |
+        sudo apt-get update && sudo apt-get install -y expect
+        npm install -g @bubblewrap/cli
 
     - name: Configure Bubblewrap
       run: |
@@ -74,15 +76,22 @@ jobs:
         }
         EOF
 
-    - name: Build APK
+    - name: Build APK with Expect
       env:
         BUBBLEWRAP_KEYSTORE_PASSWORD: password123
         BUBBLEWRAP_KEY_PASSWORD: password123
       run: |
         export PATH="$JAVA_HOME/bin:$PATH"
         cd android
-        # Создаем фейковый TTY и автоматически отвечаем "y" (Да) на вопрос про регенерацию
-        script -q -c "bubblewrap build --skipPwaValidation" /dev/null <<< "y"
+        expect -c '
+        set timeout 600
+        spawn bubblewrap build --skipPwaValidation
+        expect {
+          "regenerate your project?" { send "y\r"; exp_continue }
+          "Enter the password" { send "password123\r"; exp_continue }
+          eof
+        }
+        '
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
