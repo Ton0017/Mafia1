@@ -15,11 +15,16 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Android SDK Path
+    - name: Setup Android SDK Path & Licenses
       run: |
         echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
         echo "/usr/local/lib/android/sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        
+        # Принудительно принимаем лицензии, чтобы Gradle не спрашивал их снова
+        mkdir -p $ANDROID_HOME/licenses
+        echo -e "\n8933bad161af420fb4fb7fb3edec8f0b7f3cdc7d" > $ANDROID_HOME/licenses/android-sdk-license
+        echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_HOME/licenses/android-sdk-preview-license
 
     - name: Accept Licenses & Install Build Tools
       run: |
@@ -89,6 +94,11 @@ jobs:
         expect {
           "regenerate your project?" { send "y\r"; exp_continue }
           "Enter the password" { send "password123\r"; exp_continue }
+          "Accept? (y/N)" { send "y\r"; exp_continue }
+          "Do you accept the license" { send "y\r"; exp_continue }
+          "January 16, 2019" { send "y\r"; exp_continue }
+          "Review licenses" { send "y\r"; exp_continue }
+          "----" { send "\r"; exp_continue }
           eof
         }
         '
