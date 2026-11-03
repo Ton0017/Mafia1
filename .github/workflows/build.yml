@@ -1,0 +1,21 @@
+name: Build APK
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+    - name: Install Bubblewrap
+      run: npm install -g @bubblewrap/cli
+    - name: Init PWA
+      run: yes | bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
+    - name: Build APK
+      run: cd android && yes | bubblewrap build --skipPwaValidation
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: CityOfNoir-APK
+        path: android/app-release-signed.apk
