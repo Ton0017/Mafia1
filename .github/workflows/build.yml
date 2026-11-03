@@ -17,10 +17,8 @@ jobs:
 
     - name: Setup Android SDK Path
       run: |
-        # Используем предустановленный Android SDK на раннере
         echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-        # Добавляем sdkmanager в PATH
         echo "/usr/local/lib/android/sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
     - name: Accept Licenses & Install Build Tools
@@ -34,10 +32,7 @@ jobs:
     - name: Configure Bubblewrap
       run: |
         mkdir -p ~/.bubblewrap
-        # ВАЖНО: androidSdkPath должен указывать на папку cmdline-tools/latest, где лежит bin/sdkmanager
         echo '{"jdkPath":"'"$JAVA_HOME"'","androidSdkPath":"/usr/local/lib/android/sdk/cmdline-tools/latest"}' > ~/.bubblewrap/config.json
-        echo "--- Созданный конфиг: ---"
-        cat ~/.bubblewrap/config.json
 
     - name: Generate Keystore
       run: |
@@ -86,7 +81,8 @@ jobs:
       run: |
         export PATH="$JAVA_HOME/bin:$PATH"
         cd android
-        bubblewrap build --skipPwaValidation
+        # Автоматически отвечаем "n" на вопрос про регенерацию
+        echo "n" | bubblewrap build --skipPwaValidation
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
