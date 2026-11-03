@@ -6,14 +6,32 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Build APK with Bubblewrap Docker
-      uses: addnab/docker-run-action@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
       with:
-        image: ghcr.io/googlechromelabs/bubblewrap:latest
-        options: -v ${{ github.workspace }}:/app -w /app
-        run: |
-          bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation --yes
-          bubblewrap build --skipPwaValidation
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        accept-android-sdk-licenses: true
+
+    - name: Install Bubblewrap CLI
+      run: npm install -g @bubblewrap/cli
+
+    - name: Init PWA Project
+      run: |
+        bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
+        echo "--- Проверка созданных файлов ---"
+        ls -la android/
+
+    - name: Build APK
+      run: |
+        cd android
+        bubblewrap build --skipPwaValidation
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
