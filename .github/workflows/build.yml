@@ -4,16 +4,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Build APK with Bubblewrap Docker
+      uses: addnab/docker-run-action@v3
       with:
-        node-version: 18
-    - name: Install Bubblewrap
-      run: npm install -g @bubblewrap/cli
-    - name: Init PWA
-      run: yes | bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
-    - name: Build APK
-      run: cd android && yes | bubblewrap build --skipPwaValidation
+        image: ghcr.io/googlechromelabs/bubblewrap:latest
+        options: -v ${{ github.workspace }}:/app -w /app
+        run: |
+          bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation --yes
+          bubblewrap build --skipPwaValidation
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
