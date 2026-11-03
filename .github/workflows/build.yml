@@ -87,8 +87,7 @@ jobs:
       run: |
         export PATH="$JAVA_HOME/bin:$PATH"
         cd android
-        expect -c '
-        log_user 1
+        expect << 'EXPECT_SCRIPT'
         set timeout 600
         spawn bubblewrap build --skipPwaValidation
         expect {
@@ -97,21 +96,18 @@ jobs:
           "Accept? (y/N)" { send "y\r"; exp_continue }
           "Do you accept the license" { send "y\r"; exp_continue }
           "January 16, 2019" { send "y\r"; exp_continue }
-          "Review licenses" { send "y\r"; exp_continue }
-          "----" { send "\r"; exp_continue }
           eof
         }
-        '
+        EXPECT_SCRIPT
+        
         echo "=== ЧТО СОЗДАЛОСЬ В ПАПКЕ ANDROID ==="
-        ls -la
-        echo "=== ПОИСК APK/AAB ==="
-        find . -name "*.apk" -o -name "*.aab"
+        ls -R
+        echo "=== ПОИСК APK ==="
+        find . -name "*.apk"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: CityOfNoir-APK
-        path: |
-          android/**/*.apk
-          android/**/*.aab
+        path: "**/*.apk"
         if-no-files-found: warn
