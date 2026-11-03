@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>City of Noir</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="topbar">
+    <div class="stat" id="stat-money">$ 0</div>
+    <div class="stat" id="stat-rep">REP 0</div>
+    <div class="stat" id="stat-heat">HEAT 0</div>
+    <button id="audio-btn" onclick="Music.toggle()" title="Звук">♪</button>
+    <div class="stat" id="stat-time">День 1, 08:00</div>
+  </div>
+  <main id="screen"></main>
+  <aside id="log"></aside>
+
+  <script src="js/utils.js"></script>
+  <script src="js/state.js?v=22"></script>
+  <script src="js/save.js"></script>
+  <script src="js/engine.js?v=59"></script>
+
+  <script src="js/data/lore.js"></script>
+  <script src="js/data/weapons.js"></script>
+  <script src="js/data/buildings.js"></script>
+  <script src="js/data/mercenaries.js"></script>
+  <script src="js/data/quests.js"></script>
+  <script src="js/data/events.js"></script>
+  <script src="js/data/drugs.js"></script>
+  <script src="js/data/wounds.js"></script>
+  <script src="js/data/sprites.js"></script>
+  <script src="js/data/perks.js"></script>
+  <script src="js/data/bar_scenes.js"></script>
+  <script src="js/data/zone_scenes.js"></script>
+  <script src="js/data/dialogues.js?v=27"></script>
+
+  <script src="js/data/idle_events.js"></script>
+  <script src="js/systems/idle_events.js"></script>
+  <script src="js/systems/worldgen.js"></script>
+  <script src="js/systems/diseases.js?v=23"></script>
+  <script src="js/systems/time.js?v=26"></script>
+  <script src="js/systems/economy.js"></script>
+  <script src="js/systems/survival.js"></script>
+  <script src="js/systems/sanity.js"></script>
+  <script src="js/systems/drugs.js"></script>
+  <script src="js/systems/wounds.js?v=26"></script>
+  <script src="js/systems/combat.js?v=52"></script>
+  <script src="js/systems/quests.js"></script>
+  <script src="js/systems/hire.js"></script>
+  <script src="js/systems/building.js"></script>
+  <script src="js/systems/faction.js"></script>
+  <script src="js/systems/events.js"></script>
+  <script src="js/systems/zones.js"></script>
+  <script src="js/systems/perks.js"></script>
+  <script src="js/systems/bar_scenes.js"></script>
+  <script src="js/systems/zone_scenes.js"></script>
+  <script src="js/systems/dialogues.js"></script>
+  <script src="js/systems/death.js"></script>
+  <script src="js/systems/prestige.js"></script>
+
+  <script src="js/ui/icons.js"></script>
+  <script src="js/ui/components.js?v=20"></script>
+  <script src="js/ui/screens.js?v=59"></script>
+  <script src="js/systems/audio.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

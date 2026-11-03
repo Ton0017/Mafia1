@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>City of Noir</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="css/style.css?v=b3">
+</head>
+<body>
+  <div id="topbar">
+    <div class="stat" id="stat-money">$ 0</div>
+    <div class="stat" id="stat-rep">REP 0</div>
+    <div class="stat" id="stat-heat">HEAT 0</div>
+    <button id="audio-btn" onclick="Music.toggle()" title="Звук">♪</button>
+    <div class="stat" id="stat-time">День 1, 08:00</div>
+  </div>
+  <main id="screen"></main>
+  <aside id="log"></aside>
+
+  <script src="js/utils.js?v=b3"></script>
+  <script src="js/state.js?v=b3"></script>
+  <script src="js/save.js?v=b3"></script>
+  <script src="js/engine.js?v=b3"></script>
+
+  <script src="js/data/lore.js?v=b3"></script>
+  <script src="js/data/cards.js?v=b3"></script>
+  <script src="js/data/cars.js?v=b3"></script>
+  <script src="js/data/weapons.js?v=b3"></script>
+  <script src="js/data/buildings.js?v=b3"></script>
+  <script src="js/data/mercenaries.js?v=b3"></script>
+  <script src="js/data/quests.js?v=b3"></script>
+  <script src="js/data/events.js?v=b3"></script>
+  <script src="js/data/women.js?v=b3"></script>
+  <script src="js/data/drugs.js?v=b3"></script>
+  <script src="js/data/wounds.js?v=b3"></script>
+  <script src="js/data/sprites.js?v=b3"></script>
+  <script src="js/data/perks.js?v=b3"></script>
+  <script src="js/data/bar_scenes.js?v=b3"></script>
+  <script src="js/data/zone_scenes.js?v=b3"></script>
+  <script src="js/data/dialogues.js?v=b3"></script>
+
+  <script src="js/data/cop_events.js?v=b3"></script>
+  <script src="js/data/idle_events.js?v=b3"></script>
+  <script src="js/systems/cop_events.js?v=b3"></script>
+  <script src="js/systems/idle_events.js?v=b3"></script>
+  <script src="js/systems/worldgen.js?v=b3"></script>
+  <script src="js/systems/diseases.js?v=b3"></script>
+  <script src="js/systems/time.js?v=b3"></script>
+  <script src="js/systems/economy.js?v=b3"></script>
+  <script src="js/systems/survival.js?v=b3"></script>
+  <script src="js/systems/sanity.js?v=b3"></script>
+  <script src="js/systems/drugs.js?v=b3"></script>
+  <script src="js/systems/wounds.js?v=b3"></script>
+  <script src="js/systems/cars.js?v=b3"></script>
+  <script src="js/systems/combat.js?v=b3"></script>
+  <script src="js/systems/quests.js?v=b3"></script>
+  <script src="js/systems/hire.js?v=b3"></script>
+  <script src="js/systems/building.js?v=b3"></script>
+  <script src="js/systems/faction.js?v=b3"></script>
+  <script src="js/systems/events.js?v=b3"></script>
+  <script src="js/systems/zones.js?v=b3"></script>
+  <script src="js/systems/perks.js?v=b3"></script>
+  <script src="js/systems/bar_scenes.js?v=b3"></script>
+  <script src="js/systems/women.js?v=b3"></script>
+  <script src="js/systems/poker.js?v=b3"></script>
+  <script src="js/systems/zone_scenes.js?v=b3"></script>
+  <script src="js/systems/politics.js?v=b3"></script>
+  <script src="js/systems/dialogues.js?v=b3"></script>
+  <script src="js/systems/death.js?v=b3"></script>
+  <script src="js/systems/prestige.js?v=b3"></script>
+
+  <script src="js/ui/icons.js?v=b3"></script>
+  <script src="js/ui/components.js?v=b3"></script>
+  <script src="js/ui/screens.js?v=b3"></script>
+  <script src="js/systems/audio.js?v=b3"></script>
+  <script src="js/main.js?v=b3"></script>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js").catch(() => {})); }</script>
+</body>
+</html>

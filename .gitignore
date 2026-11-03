@@ -1,0 +1,29 @@
+# Backups
+js_backup_*/
+*.bak
+*.bak2
+*.bak3
+*.bak4
+*.bak5
+*.bak6
+*.bak7
+*.bak8
+*.bak9
+
+# Deps
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Android build
+*.apk
+*.aab
+*.keystore
+
+# Saves (если вдруг попадут)
+saves/
