@@ -13,24 +13,20 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      with:
-        accept-android-sdk-licenses: true
+    - name: Accept Android SDK Licenses
+      run: |
+        mkdir -p $ANDROID_HOME/licenses
+        echo -e "\n8933bad161af420fb4fb7fb3edec8f0b7f3cdc7d" > $ANDROID_HOME/licenses/android-sdk-license
+        echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_HOME/licenses/android-sdk-preview-license
 
-    - name: Install Bubblewrap CLI
+    - name: Install Bubblewrap
       run: npm install -g @bubblewrap/cli
 
-    - name: Init PWA Project
+    - name: Init and Build
       run: |
-        bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
-        echo "--- Проверка созданных файлов ---"
-        ls -la android/
-
-    - name: Build APK
-      run: |
+        yes | bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
         cd android
-        bubblewrap build --skipPwaValidation
+        yes | bubblewrap build --skipPwaValidation
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
