@@ -79,9 +79,9 @@ jobs:
         echo "=== НАЙДЕННЫЕ APK ==="
         find platforms/android/app/build/outputs -name "*.apk" -o -name "*.aab" || true
 
-    - name: Upload APK
+    - name: Upload Build Output
       uses: actions/upload-artifact@v4
       with:
-        name: CityOfNoir-Release-APK
-        path: app/platforms/android/app/build/outputs/**/*.apk
+        name: CityOfNoir-Build
+        path: app/platforms/android/app/build/outputs/
         if-no-files-found: error
