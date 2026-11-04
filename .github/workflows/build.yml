@@ -75,7 +75,7 @@ jobs:
 
         printf '%s\n' '{' '  "android": {' '    "release": {' '      "keystore": "platforms/android/app/release.keystore",' '      "storePassword": "noirpassword",' '      "alias": "noir",' '      "password": "noirpassword"' '    }' '  }' '}' > build.json
 
-        cordova build android --release --packageType=apk --buildConfig=build.json
+        cordova build android --release --device --buildConfig=build.json
         echo "=== НАЙДЕННЫЕ APK ==="
         find platforms/android/app/build/outputs -name "*.apk" -o -name "*.aab" || true
 
