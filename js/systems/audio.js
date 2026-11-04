@@ -11,18 +11,14 @@ const Music = {
     if (this.player) return;
     this.player = document.createElement('audio');
     this.player.volume = 0.15;
-    
-    this.player.addEventListener('ended', () => {
-      if (!this.enabled) return;
-      if (this.inCombat) {
-        this.player.currentTime = 0;
-        this.player.play().catch(e => console.warn(e));
-      } else {
-        this.currentBg = (this.currentBg + 1) % this.bgPlaylist.length;
-        this.player.src = this.bgPlaylist[this.currentBg];
-        this.player.play().catch(e => console.warn(e));
+    this.player.loop = true; // Нативное зацикливание (WebView не сможет остановить)
+
+    // Страховка: если WebView поставил на паузу, принудительно включаем
+    setInterval(() => {
+      if (this.enabled && this.player && this.player.src && this.player.paused) {
+        this.player.play().catch(() => {});
       }
-    });
+    }, 3000);
 
     try { if (localStorage.getItem('noir_audio') === 'on') this.enabled = true; } catch (e) {}
   },
@@ -33,6 +29,7 @@ const Music = {
     if (!this.player.src) {
       this.player.src = this.inCombat ? this.combatTrack : this.bgPlaylist[this.currentBg];
     }
+    this.player.loop = true;
     this.player.play().then(() => {
       this.enabled = true;
       try { localStorage.setItem('noir_audio', 'on'); } catch (e) {}
@@ -55,6 +52,7 @@ const Music = {
     this.init();
     if (!this.enabled || !this.player) return;
     this.inCombat = true;
+    this.player.loop = true;
     this.player.src = this.combatTrack;
     this.player.volume = 0.25; // В бою делаем чуть громче
     this.player.play().catch(e => console.warn(e));
@@ -64,6 +62,7 @@ const Music = {
     this.init();
     if (!this.enabled || !this.player) return;
     this.inCombat = false;
+    this.player.loop = true;
     this.player.src = this.bgPlaylist[this.currentBg];
     this.player.volume = 0.15; // В городе — тихий фон
     this.player.play().catch(e => console.warn(e));
