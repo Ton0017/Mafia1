@@ -88,20 +88,20 @@ jobs:
         export PATH="$JAVA_HOME/bin:$PATH"
         cd android
         expect << 'EXPECT_SCRIPT'
+        set stty_init "columns 200"
         set timeout 900
         spawn bubblewrap build --skipPwaValidation
         expect {
-          "regenerate your project?" { send "n\r"; exp_continue }
+          "No checksum file was found" { send "n\r"; exp_continue }
           "Enter the password" { send "password123\r"; exp_continue }
           "Accept? (y/N)" { send "y\r"; exp_continue }
           "Do you accept the license" { send "y\r"; exp_continue }
           "January 16, 2019" { send "y\r"; exp_continue }
+          timeout { puts "TIMEOUT!"; exit 1 }
           eof
         }
         EXPECT_SCRIPT
         
-        echo "=== ЧТО СОЗДАЛОСЬ В ПАПКЕ ANDROID ==="
-        ls -R
         echo "=== ПОИСК APK ==="
         find . -name "*.apk"
 
