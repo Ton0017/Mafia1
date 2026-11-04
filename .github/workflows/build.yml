@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Release APK
 on: push
 jobs:
   build:
@@ -39,69 +39,45 @@ jobs:
         rm -rf ~/.cordova ~/.plugman
         cordova platform add android
 
-        # 1. РИСУЕМ КРАСИВУЮ ИКОНКУ И СПЛЭШ ЧЕРЕЗ PYTHON
+        # Генерируем иконки (наш туз червей)
         mkdir -p resources/android
         python3 -c "
-        from PIL import Image, ImageDraw, ImageFont
+        from PIL import Image, ImageDraw
         
         def draw_ace(size):
-            # Черный фон (прозрачный для адаптивной иконки, черный для основной)
             img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
             draw = ImageDraw.Draw(img)
-            
-            # Размеры карты
             margin = size // 10
             w, h = size - margin*2, size - margin*2
-            card_rect = [margin, margin, margin+w, margin+h]
-            
-            # Белая карта с закругленными углами
-            draw.rounded_rectangle(card_rect, radius=size//15, fill=(232, 232, 232, 255))
-            
-            # Красное сердце по центру (состоит из кругов и треугольника)
+            draw.rounded_rectangle([margin, margin, margin+w, margin+h], radius=size//15, fill=(232, 232, 232, 255))
             cx, cy = size//2, size//2 + size//20
             r = size // 7
             draw.ellipse([cx-r, cy-r, cx, cy], fill=(163, 38, 38, 255))
             draw.ellipse([cx, cy-r, cx+r, cy], fill=(163, 38, 38, 255))
             draw.polygon([(cx-r, cy-r//2), (cx+r, cy-r//2), (cx, cy+r+size//10)], fill=(163, 38, 38, 255))
-            
-            # Буква А в углах (упрощенно, линиями)
             lw = max(2, size // 64)
-            # Верхний левый
             draw.line([(margin+20, margin+40), (margin+35, margin+15)], fill=(10, 10, 10, 255), width=lw)
             draw.line([(margin+35, margin+15), (margin+50, margin+40)], fill=(10, 10, 10, 255), width=lw)
             draw.line([(margin+27, margin+30), (margin+43, margin+30)], fill=(10, 10, 10, 255), width=lw)
-            
-            # Нижний правый (перевернутая)
             draw.line([(margin+w-20, margin+h-40), (margin+w-35, margin+h-15)], fill=(10, 10, 10, 255), width=lw)
             draw.line([(margin+w-35, margin+h-15), (margin+w-50, margin+h-40)], fill=(10, 10, 10, 255), width=lw)
             draw.line([(margin+w-27, margin+h-30), (margin+w-43, margin+h-30)], fill=(10, 10, 10, 255), width=lw)
-            
             return img
 
-        # Генерируем основную иконку (1024x1024)
         main_icon = Image.new('RGB', (1024, 1024), (10, 10, 10))
         main_icon.paste(draw_ace(1024), (0,0), draw_ace(1024))
         main_icon.save('resources/icon.png')
-        
-        # Для адаптивных иконок Android (432x432)
-        fg = draw_ace(432)
-        fg.save('resources/android/icon-foreground.png')
+        draw_ace(432).save('resources/android/icon-foreground.png')
         Image.new('RGB', (432, 432), (10, 10, 10)).save('resources/android/icon-background.png')
-        
-        # Сплэш (черный фон с картой по центру)
         splash = Image.new('RGB', (2732, 2732), (10, 10, 10))
-        splash_card = main_icon.resize((1024, 1024), Image.Resampling.LANCZOS)
-        splash.paste(splash_card, ((2732-1024)//2, (2732-1024)//2))
+        splash.paste(main_icon.resize((1024, 1024), Image.Resampling.LANCZOS), ((2732-1024)//2, (2732-1024)//2))
         splash.save('resources/splash.png')
         "
 
-        # 2. Генерируем все размеры
         cordova-res android --skip-config --copy
 
-        # 3. Настройки config.xml
         sed -i 's|</widget>|  <platform name="android">\n    <icon background="resources/android/icon-background.png" density="mdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="hdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxxhdpi" foreground="resources/android/icon-foreground.png" />\n    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/splash.png" />\n    <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  </platform>\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
 
-        # 4. HTML
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -110,24 +86,23 @@ jobs:
             <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
             <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
             <title>City of Noir</title>
-            <style>
-              html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a0a0a; }
-              iframe { border: none; width: 100%; height: 100%; }
-            </style>
+            <style>html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a0a0a; } iframe { border: none; width: 100%; height: 100%; }</style>
           </head>
-          <body>
-            <iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe>
-          </body>
+          <body><iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe></body>
         </html>
         EOF
 
-        # 5. Сборка
-        cordova clean android
-        cordova build android
+        # === НОВЫЙ БЛОК: ГЕНЕРАЦИЯ КЛЮЧА И СБОРКА RELEASE ===
+        cd platforms/android/app
+        keytool -genkey -v -keystore release.keystore -alias noir -keyalg RSA -keysize 2048 -validity 10000 -storepass noirpassword -keypass noirpassword -dname "CN=City of Noir, O=Indie, C=RU" || true
+        
+        cd ../..
+        cordova build android --release -- --keystore=platforms/android/app/release.keystore --storePassword=noirpassword --alias=noir --password=noirpassword
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: CityOfNoir-APK
-        path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        name: CityOfNoir-Release-APK
+        # Путь к release файлу
+        path: app/platforms/android/app/build/outputs/apk/release/app-release.apk
         if-no-files-found: error
