@@ -121,6 +121,8 @@ const Hire = {
       } 
       // Для остальных миссий — проверяем время
       else if (m.status === 'onMission' && m.mission && now >= m.mission.until) {
+        // Миссия захвата зоны обрабатывается в ZonesSystem
+        if (m.mission.type === 'capture') continue;
         this.resolveMission(m);
       }
     }

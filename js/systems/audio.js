@@ -11,11 +11,28 @@ const Music = {
     if (this.player) return;
     this.player = document.createElement('audio');
     this.player.volume = 0.15;
-    this.player.loop = true; // Нативное зацикливание (WebView не сможет остановить)
+    this.player.loop = false; // Фон крутится, потом переключается
 
-    // Страховка: если WebView поставил на паузу, принудительно включаем
+    // Переключение трека после окончания
+    this.player.addEventListener('ended', () => {
+      if (!this.enabled || this.inCombat) return;
+      this.currentBg = (this.currentBg + 1) % this.bgPlaylist.length;
+      this.player.src = this.bgPlaylist[this.currentBg];
+      this.player.play().catch(e => console.warn(e));
+    });
+
+    // Страховка для WebView, если ended не сработал
     setInterval(() => {
-      if (this.enabled && this.player && this.player.src && this.player.paused) {
+      if (!this.enabled || !this.player || !this.player.src) return;
+      if (this.player.paused) {
+        if (this.player.duration && this.player.currentTime >= this.player.duration - 0.5) {
+          if (this.inCombat) {
+            this.player.currentTime = 0;
+          } else {
+            this.currentBg = (this.currentBg + 1) % this.bgPlaylist.length;
+            this.player.src = this.bgPlaylist[this.currentBg];
+          }
+        }
         this.player.play().catch(() => {});
       }
     }, 3000);
@@ -29,7 +46,7 @@ const Music = {
     if (!this.player.src) {
       this.player.src = this.inCombat ? this.combatTrack : this.bgPlaylist[this.currentBg];
     }
-    this.player.loop = true;
+    this.player.loop = this.inCombat;
     this.player.play().then(() => {
       this.enabled = true;
       try { localStorage.setItem('noir_audio', 'on'); } catch (e) {}
@@ -62,7 +79,7 @@ const Music = {
     this.init();
     if (!this.enabled || !this.player) return;
     this.inCombat = false;
-    this.player.loop = true;
+    this.player.loop = false;
     this.player.src = this.bgPlaylist[this.currentBg];
     this.player.volume = 0.15; // В городе — тихий фон
     this.player.play().catch(e => console.warn(e));
