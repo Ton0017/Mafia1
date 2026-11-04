@@ -27,33 +27,44 @@ jobs:
       run: |
         cordova create app io.github.ton0017.mafia "City of Noir"
         cd app
+
+        # 1. ФИКС PACKAGE.JSON (убираем type: module, ставим commonjs)
+        python3 -c "
+        import json
+        with open('package.json', 'r') as f: pkg = json.load(f)
+        pkg['type'] = 'commonjs'
+        with open('package.json', 'w') as f: json.dump(pkg, f, indent=2)
+        print('OK: package.json type = commonjs')
+        "
+
+        # 2. ОЧИСТКА КЭША CORDOVA (лечит ENOENT при add android)
+        rm -rf ~/.cordova
+        rm -rf ~/.plugman
+
+        # 3. Добавляем платформу
         cordova platform add android
 
-        # 1. Генерируем ресурсы (иконка и черный фон)
+        # 4. Генерируем ресурсы (иконка и черный фон)
         mkdir -p resources/android
         python3 -c "
         from PIL import Image
         icon = Image.open('../assets/icons/icon-512.png')
-        # Основная иконка
         icon.resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
-        # Для адаптивных иконок Android
         icon.resize((432, 432), Image.Resampling.LANCZOS).save('resources/android/icon-foreground.png')
         Image.new('RGB', (432, 432), '#0a0a0a').save('resources/android/icon-background.png')
-        # Сплэш
         Image.new('RGB', (2732, 2732), '#0a0a0a').save('resources/splash.png')
         "
 
-        # 2. Генерируем иконки
+        # 5. Генерируем иконки
         cordova-res android --skip-config --copy
 
-        # 3. САМОЕ ВАЖНОЕ: явно прописываем иконки в config.xml
-        # Без этого Cordova затирает их своими дефолтными (роботом)
+        # 6. ЯВНО ПРОПИСЫВАЕМ ИКОНКИ В CONFIG.XML (убиваем робота)
         sed -i 's|</widget>|  <platform name="android">\n    <icon background="resources/android/icon-background.png" density="mdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="hdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxxhdpi" foreground="resources/android/icon-foreground.png" />\n    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/android/icon-foreground.png" />\n    <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  </platform>\n</widget>|' config.xml
 
-        # 4. Настройки звука
+        # 7. Настройки звука
         sed -i 's|</widget>|  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
 
-        # 5. HTML
+        # 8. HTML
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -73,9 +84,7 @@ jobs:
         </html>
         EOF
 
-        # 6. Собираем с нуля
-        cordova platform remove android
-        cordova platform add android
+        # 9. Сборка
         cordova build android
 
     - name: Upload APK
