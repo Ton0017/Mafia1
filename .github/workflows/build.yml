@@ -18,9 +18,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova and Pillow
+    - name: Install Cordova and cordova-res
       run: |
-        npm install -g cordova
+        npm install -g cordova cordova-res
         pip install Pillow
 
     - name: Create Cordova App
@@ -29,20 +29,25 @@ jobs:
         cd app
         cordova platform add android
 
-        # 1. УСТАНАВЛИВАЕМ НАШУ ИКОНКУ (ТУЗ ЧЕРВЕЙ)
+        # 1. ПОДГОТОВКА РЕСУРСОВ ДЛЯ cordova-res
+        mkdir -p resources
+        # Копируем нашу иконку (туз червей)
+        cp ../assets/icons/icon-512.png resources/icon.png
+        
+        # Создаем черный сплэш 1024x1024 через Python
         python3 -c "
-        import os
         from PIL import Image
-        sizes = {'mipmap-mdpi': 48, 'mipmap-hdpi': 72, 'mipmap-xhdpi': 96, 'mipmap-xxhdpi': 144, 'mipmap-xxxhdpi': 192}
-        img = Image.open('../assets/icons/icon-192.png')
-        for folder, size in sizes.items():
-            resized = img.resize((size, size), Image.Resampling.LANCZOS)
-            path = f'platforms/android/app/src/main/res/{folder}/ic_launcher.png'
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            resized.save(path)
+        Image.new('RGB', (1024, 1024), '#0a0a0a').save('resources/splash.png')
         "
 
-        # 2. ВСТРАИВАЕМ СПЛЭШ И IFrame
+        # 2. ГЕНЕРАЦИЯ ИКОНОК И СПЛЭША ДЛЯ ANDROID
+        cordova-res android --skip-config --copy
+
+        # Отключаем задержку стандартного сплэша
+        sed -i 's|<preference name="SplashScreenDelay" value="3000" />|<preference name="SplashScreenDelay" value="0" />|g' config.xml || true
+        sed -i 's|<preference name="SplashScreen" value="screen" />|<preference name="SplashScreen" value="screen" />|g' config.xml || true
+
+        # 3. ВСТРАИВАЕМ НАШ HTML СПЛЭШ
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -83,7 +88,6 @@ jobs:
             <script>
               const frame = document.getElementById('game-frame');
               const splash = document.getElementById('splash');
-              // Когда игра загрузилась, ждем 1.5 сек и плавно убираем сплэш
               frame.onload = () => {
                 setTimeout(() => {
                   splash.classList.add('fade');
@@ -94,6 +98,9 @@ jobs:
           </body>
         </html>
         EOF
+
+        # Устанавливаем плагин, чтобы iframe точно работал без ошибок безопасности
+        cordova plugin add cordova-plugin-whitelist || true
 
     - name: Build APK
       run: |
