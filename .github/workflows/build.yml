@@ -89,10 +89,10 @@ jobs:
         </html>
         EOF
 
-        # 1. Создаем ключ
+        # 1. Создаем ключ (в папке android/app)
         cd platforms/android/app
         keytool -genkey -v -keystore release.keystore -alias noir -keyalg RSA -keysize 2048 -validity 10000 -storepass noirpassword -keypass noirpassword -dname "CN=City of Noir, O=Indie, C=RU" || true
-        cd ../..
+        cd ../../../..
 
         # 2. Создаем build.json для автоматической подписи Cordova
         cat > build.json << 'EOF'
