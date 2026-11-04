@@ -18,7 +18,7 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova and cordova-res
+    - name: Install Cordova, cordova-res, Pillow
       run: |
         npm install -g cordova cordova-res
         pip install Pillow
@@ -29,32 +29,35 @@ jobs:
         cd app
         cordova platform add android
 
-        # 1. Готовим все ресурсы для cordova-res
+        # 1. Готовим ресурсы для cordova-res
         mkdir -p resources/android
         python3 -c "
         from PIL import Image
         icon = Image.open('../assets/icons/icon-512.png')
-        # Основная иконка
+        
+        # Основная иконка (1024x1024)
         icon.resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
-        # Адаптивные иконки (передний и задний план)
+        
+        # Для адаптивных иконок Android (432x432) - это убирает робота
         icon.resize((432, 432), Image.Resampling.LANCZOS).save('resources/android/icon-foreground.png')
         Image.new('RGB', (432, 432), '#0a0a0a').save('resources/android/icon-background.png')
+        
         # Сплэш 2732x2732 (черный)
         Image.new('RGB', (2732, 2732), '#0a0a0a').save('resources/splash.png')
         "
 
-        # 2. Генерируем иконки для Android
+        # 2. Генерируем все иконки и сплэши
         cordova-res android --skip-config --copy
 
-        # 3. Настраиваем config.xml: убиваем робота на сплэше
-        sed -i 's|</widget>|  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icon/android/icon-foreground.png" />\n  <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
-
-        # 4. Вставляем наш HTML
+        # 3. Вставляем наш HTML с РАЗРЕШЕНИЕМ ДЛЯ IFRAME
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
           <head>
             <meta charset="utf-8">
+            <!-- РАЗРЕШАЕМ ЗАГРУЗКУ САЙТА В IFRAME -->
+            <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
+            
             <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
             <title>City of Noir</title>
             <style>
@@ -90,6 +93,7 @@ jobs:
             <script>
               const frame = document.getElementById('game-frame');
               const splash = document.getElementById('splash');
+              // Скрываем сплэш, когда iframe загрузился
               frame.onload = () => {
                 setTimeout(() => {
                   splash.classList.add('fade');
@@ -101,7 +105,8 @@ jobs:
         </html>
         EOF
 
-        # 5. Собираем
+        # 4. Собираем чистый APK (предварительно очистив старые сборки)
+        cordova clean android
         cordova build android
 
     - name: Upload APK
