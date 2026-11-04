@@ -29,7 +29,7 @@ jobs:
         cd app
         cordova platform add android
 
-        # 1. Подготовка ресурсов
+        # 1. Готовим ресурсы
         mkdir -p resources/android
         python3 -c "
         from PIL import Image
@@ -40,20 +40,18 @@ jobs:
         Image.new('RGB', (2732, 2732), '#0a0a0a').save('resources/splash.png')
         "
 
-        # 2. Генерируем иконки и сплэши через cordova-res
+        # 2. Генерируем иконки и сплэши
         cordova-res android --skip-config --copy
 
-        # 3. УБИВАЕМ РОБОТА НА ИКОНКЕ: удаляем XML-файлы адаптивных иконок Cordova
-        rm -rf platforms/android/app/src/main/res/mipmap-anydpi-v26
+        # 3. ВАЖНО: НЕ удаляем mipmap-anydpi-v26. Вместо этого перезаписываем файлы внутри.
+        # (cordova-res уже создал правильные XML, но на всякий случай копируем наши PNG поверх)
+        cp resources/android/icon-foreground.png platforms/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_foreground.png || true
+        cp resources/android/icon-background.png platforms/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_background.png || true
 
-        # 4. УБИВАЕМ РОБОТА НА СПЛЭШЕ: создаем нашу картинку для Android 12+
-        mkdir -p platforms/android/app/src/main/res/icons
-        cp ../assets/icons/icon-512.png platforms/android/app/src/main/res/icons/splash_icon.png
+        # 4. Настраиваем config.xml для сплэша (указываем правильный путь)
+        sed -i 's|</widget>|  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/splash.png" />\n  <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
 
-        # 5. Настраиваем config.xml
-        sed -i 's|</widget>|  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icons/splash_icon.png" />\n  <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
-
-        # 6. Вставляем наш HTML с разрешением на iframe
+        # 5. Вставляем HTML
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -73,7 +71,8 @@ jobs:
         </html>
         EOF
 
-        # 7. Собираем APK
+        # 6. Собираем
+        cordova clean android
         cordova build android
 
     - name: Upload APK
