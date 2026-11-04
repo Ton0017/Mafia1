@@ -18,9 +18,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova and tools
+    - name: Install Cordova and Pillow
       run: |
-        npm install -g cordova cordova-res
+        npm install -g cordova
         pip install Pillow
 
     - name: Create Cordova App
@@ -29,24 +29,38 @@ jobs:
         cd app
         cordova platform add android
 
-        mkdir -p resources
+        # ЖЕСТКАЯ ЗАМЕНА: удаляем все дефолтные иконки и сплэши Android
+        rm -rf platforms/android/app/src/main/res/mipmap-*
+        rm -rf platforms/android/app/src/main/res/drawable*
         
-        # Генерируем иконку 1024x1024 и системный сплэш 2732x2732 (черный)
+        # Генерируем иконки из нашего туза и черный сплэш
         python3 -c "
+        import os
         from PIL import Image
-        # Иконка из нашей 512
-        Image.open('../assets/icons/icon-512.png').resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
-        # Системный сплэш (просто черный, чтобы не было робота)
-        Image.new('RGB', (2732, 2732), '#000000').save('resources/splash.png')
+        img = Image.open('../assets/icons/icon-512.png')
+        
+        sizes = {'mipmap-mdpi': 48, 'mipmap-hdpi': 72, 'mipmap-xhdpi': 96, 'mipmap-xxhdpi': 144, 'mipmap-xxxhdpi': 192}
+        for folder, size in sizes.items():
+            resized = img.resize((size, size), Image.Resampling.LANCZOS)
+            path = f'platforms/android/app/src/main/res/{folder}'
+            os.makedirs(path, exist_ok=True)
+            resized.save(f'{path}/ic_launcher.png')
+            resized.save(f'{path}/ic_launcher_round.png')
+            
+        # Создаем черный системный сплэш во всех папках drawable
+        for folder in ['drawable', 'drawable-land-hdpi', 'drawable-land-ldpi', 'drawable-land-mdpi', 'drawable-land-xhdpi', 'drawable-land-xxhdpi', 'drawable-land-xxxhdpi', 'drawable-port-hdpi', 'drawable-port-ldpi', 'drawable-port-mdpi', 'drawable-port-xhdpi', 'drawable-port-xxhdpi', 'drawable-port-xxxhdpi']:
+            path = f'platforms/android/app/src/main/res/{folder}'
+            os.makedirs(path, exist_ok=True)
+            Image.new('RGB', (1920, 1920), '#000000').save(f'{path}/screen.png')
         "
 
-        # Запускаем официальный генератор (он перезапишет адаптивные иконки и сплэши)
-        cordova-res android --skip-config --copy
+        # Прописываем иконку и сплэш в config.xml, чтобы Cordova не выпендривалась
+        sed -i 's|<widget|<widget|g' config.xml
+        echo '<preference name="SplashScreen" value="screen" />' >> config.xml
+        echo '<preference name="SplashScreenDelay" value="0" />' >> config.xml
+        echo '<preference name="AndroidWindowSplashScreenAnimatedIcon" value="screen" />' >> config.xml
 
-        # Убираем задержку системного сплэша Cordova, чтобы робот не висел
-        sed -i 's|<preference name="SplashScreenDelay" value="3000" />|<preference name="SplashScreenDelay" value="0" />|g' config.xml || true
-
-        # Вставляем наш HTML со сплэшем
+        # Вставляем наш HTML
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
