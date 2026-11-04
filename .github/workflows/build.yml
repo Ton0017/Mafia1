@@ -28,7 +28,6 @@ jobs:
         cordova create app io.github.ton0017.mafia "City of Noir"
         cd app
 
-        # Фикс package.json
         python3 -c "
         import json
         with open('package.json', 'r') as f: pkg = json.load(f)
@@ -39,11 +38,9 @@ jobs:
         rm -rf ~/.cordova ~/.plugman
         cordova platform add android
 
-        # Генерируем иконки (наш туз червей)
         mkdir -p resources/android
         python3 -c "
         from PIL import Image, ImageDraw
-        
         def draw_ace(size):
             img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
             draw = ImageDraw.Draw(img)
@@ -92,17 +89,27 @@ jobs:
         </html>
         EOF
 
-        # === НОВЫЙ БЛОК: ГЕНЕРАЦИЯ КЛЮЧА И СБОРКА RELEASE ===
         cd platforms/android/app
         keytool -genkey -v -keystore release.keystore -alias noir -keyalg RSA -keysize 2048 -validity 10000 -storepass noirpassword -keypass noirpassword -dname "CN=City of Noir, O=Indie, C=RU" || true
         
         cd ../..
-        cordova build android --release -- --keystore=platforms/android/app/release.keystore --storePassword=noirpassword --alias=noir --password=noirpassword
+        cordova build android --release -- --keystore=platforms/android/app/release.keystore --storePassword=noirpassword --alias=noir --password=noirpassword || true
+
+        APK_DIR=platforms/android/app/build/outputs/apk/release
+        if [ -f "$APK_DIR/app-release-unsigned.apk" ]; then
+          BT=$(ls $ANDROID_HOME/build-tools/ | sort -V | tail -1)
+          $ANDROID_HOME/build-tools/$BT/apksigner sign \
+            --ks platforms/android/app/release.keystore \
+            --ks-pass pass:noirpassword --key-pass pass:noirpassword \
+            --out "$APK_DIR/app-release.apk" "$APK_DIR/app-release-unsigned.apk"
+        fi
+        
+        echo "=== НАЙДЕННЫЕ APK ==="
+        find platforms/android/app/build/outputs/apk -name "*.apk"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: CityOfNoir-Release-APK
-        # Путь к release файлу
-        path: app/platforms/android/app/build/outputs/apk/release/app-release.apk
+        path: app/platforms/android/app/build/outputs/apk/**/*.apk
         if-no-files-found: error

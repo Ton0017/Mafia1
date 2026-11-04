@@ -285,6 +285,7 @@ const Combat = {
         const loaded = Math.min(needed, reserve);
         c.playerState.ammo += loaded;
         State.player.inventory.ammo[ammoType.id] = reserve - loaded;
+        if (typeof Sfx !== 'undefined') Sfx.play('reload');
         this._log('Перезарядка: +' + loaded + ' патронов. В запасе: ' + (reserve - loaded) + '.', 'info');
         break;
       }
@@ -387,6 +388,7 @@ const Combat = {
     const target = Utils.pick(['head', 'torso', 'torso', 'torso', 'leftArm', 'rightArm']);
 
     if (Utils.chance(hitChance)) {
+      if (typeof Sfx !== 'undefined') Sfx.play('melee');
       const bodyMult = Weapons.bodyMultByCategory.melee;
       const dmg = Math.round(baseDmg * (bodyMult[target] || 1));
       this._applyDamage('enemy', target, dmg);
@@ -462,7 +464,9 @@ const Combat = {
       leftLeg: 'левую ногу', rightLeg: 'правую ногу',
     }[target] || 'корпус';
 
+    if (typeof Sfx !== 'undefined') Sfx.play('shoot_' + weapon.category);
     if (Utils.chance(hit)) {
+      if (typeof Sfx !== 'undefined') Sfx.play('hit');
       let dmg = Math.round(weapon.damage * (bodyMult[target] || 1));
 
       if (isPlayer && typeof Perks !== 'undefined') {
@@ -489,6 +493,7 @@ const Combat = {
         this._log(c.enemy.name + ' хромает. Ты видишь это.', 'info');
       }
     } else {
+      if (typeof Sfx !== 'undefined') Sfx.play('miss');
       this._log(`${shooterName} → ${targetName}. ${Utils.pick(Lore.noir.combat.miss)}`, 'combat');
     }
 
@@ -526,6 +531,7 @@ const Combat = {
     if (p.hp <= 0 && (part === 'head' || part === 'torso')) {
       if (targetKey === 'enemy') {
         c.enemy.dead = true;
+        if (typeof Sfx !== 'undefined') Sfx.play('death');
         this._log('Он падает. ' + Utils.pick(Lore.noir.win), 'combat');
       } else {
         this._finish('lose');

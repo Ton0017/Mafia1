@@ -26,4 +26,14 @@ window.addEventListener('DOMContentLoaded', () => {
     Engine.go('menu');
     setTimeout(() => splash.remove(), 400);
   }, 1700);
+
+  // Разблокировка AudioContext на первом клике
+  const unlockAudio = () => {
+    if (typeof Music !== 'undefined') { Music.init(); Music.resume && Music.resume(); }
+    if (typeof Sfx !== 'undefined') { Sfx.init(); Sfx.resume(); }
+    document.removeEventListener('touchstart', unlockAudio);
+    document.removeEventListener('mousedown', unlockAudio);
+  };
+  document.addEventListener('touchstart', unlockAudio, { once: true });
+  document.addEventListener('mousedown', unlockAudio, { once: true });
 });
