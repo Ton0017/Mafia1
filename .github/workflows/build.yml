@@ -18,74 +18,35 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova and Pillow
+    - name: Install Cordova, cordova-res, Pillow
       run: |
-        npm install -g cordova
+        npm install -g cordova cordova-res
         pip install Pillow
 
-    - name: Create Cordova App
+    - name: Create and Build App
       run: |
         cordova create app io.github.ton0017.mafia "City of Noir"
         cd app
+        
+        # Добавляем платформу и официальный плагин для сплэша
         cordova platform add android
+        cordova plugin add cordova-plugin-splashscreen
         
-        # 1. Подготовка платформы (создает стандартные файлы)
-        cordova prepare android
-
-        # 2. ХИРУРГИЧЕСКОЕ ВМЕШАТЕЛЬСТВО
+        # Генерируем ресурсы (иконка и черный фон для нативного сплэша)
+        mkdir -p resources
         python3 -c "
-        import os
         from PIL import Image
-        
-        res_path = 'platforms/android/app/src/main/res'
-        
-        # Удаляем адаптивные иконки Cordova (из-за них вылезает робот)
-        os.system(f'rm -rf {res_path}/mipmap-anydpi-v26')
-        
-        # Заменяем иконки на нашего туза
-        img = Image.open('../assets/icons/icon-512.png')
-        sizes = {'mipmap-mdpi': 48, 'mipmap-hdpi': 72, 'mipmap-xhdpi': 96, 'mipmap-xxhdpi': 144, 'mipmap-xxxhdpi': 192}
-        for folder, size in sizes.items():
-            path = f'{res_path}/{folder}'
-            os.makedirs(path, exist_ok=True)
-            resized = img.resize((size, size), Image.Resampling.LANCZOS)
-            resized.save(f'{path}/ic_launcher.png')
-            resized.save(f'{path}/ic_launcher_round.png')
-        
-        # Перезаписываем картинку системного сплэша (черный фон)
-        for folder in os.listdir(res_path):
-            if folder.startswith('drawable'):
-                path = f'{res_path}/{folder}'
-                if os.path.isdir(path):
-                    Image.new('RGB', (1920, 1920), '#000000').save(f'{path}/screen.png')
+        Image.open('../assets/icons/icon-512.png').resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
+        Image.new('RGB', (2732, 2732), '#0a0a0a').save('resources/splash.png')
         "
+        
+        # Применяем иконки ко всем версиям Android (включая адаптивные)
+        cordova-res android --skip-config --copy
 
-        # 3. ВШИВАЕМ СТИЛИ ДЛЯ ANDROID 12+ (чтобы убрать робота с экрана загрузки)
-        mkdir -p platforms/android/app/src/main/res/values-v31
-        cat > platforms/android/app/src/main/res/values-v31/styles.xml << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <resources>
-            <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-                <item name="windowSplashScreenBackground">#0a0a0a</item>
-                <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-                <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
-            </style>
-        </resources>
-        EOF
+        # Настраиваем config.xml: задержка 0, чтобы робот не висел, и автоскрытие отключено (скроем сами)
+        sed -i 's|</widget>|  <preference name="AutoHideSplashScreen" value="false" />\n  <preference name="SplashScreenDelay" value="0" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
 
-        # Меняем фон в старых версиях Android
-        cat > platforms/android/app/src/main/res/values/styles.xml << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <resources>
-            <style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">
-                <item name="android:background">#0a0a0a</item>
-            </style>
-        </resources>
-        EOF
-
-        # 4. Настройки звука и HTML
-        sed -i 's|</widget>|  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
-
+        # Вставляем наш HTML
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -124,24 +85,25 @@ jobs:
             </div>
             <iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe>
             <script>
-              const frame = document.getElementById('game-frame');
-              const splash = document.getElementById('splash');
-              frame.onload = () => {
-                setTimeout(() => {
-                  splash.classList.add('fade');
-                  setTimeout(() => splash.remove(), 400);
-                }, 1500);
-              };
+              document.addEventListener('deviceready', () => {
+                if (navigator.splashscreen) navigator.splashscreen.hide();
+                
+                const frame = document.getElementById('game-frame');
+                const splash = document.getElementById('splash');
+                frame.onload = () => {
+                  setTimeout(() => {
+                    splash.classList.add('fade');
+                    setTimeout(() => splash.remove(), 400);
+                  }, 1500);
+                };
+              });
             </script>
           </body>
         </html>
         EOF
 
-    - name: Compile APK (Skip Prepare)
-      run: |
-        cd app
-        # ВАЖНО: compile вместо build, чтобы не перезаписал наши иконки!
-        cordova compile android
+        # Собираем
+        cordova build android
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
