@@ -109,10 +109,10 @@ jobs:
         EOF
 
         # 3. Собираем APK (Cordova сама его подпишет и положит в release)
-        cordova build android --release --buildConfig=build.json
+        cordova build android --release --packageType=apk --buildConfig=build.json
         
         echo "=== НАЙДЕННЫЕ APK ==="
-        find platforms/android/app/build/outputs/apk -name "*.apk"
+        find platforms/android/app/build/outputs -name "*.apk" -o -name "*.aab" || true
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
