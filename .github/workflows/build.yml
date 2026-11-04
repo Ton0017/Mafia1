@@ -18,10 +18,8 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova and cordova-res
-      run: |
-        npm install -g cordova cordova-res
-        pip install Pillow
+    - name: Install Cordova
+      run: npm install -g cordova
 
     - name: Create Cordova App
       run: |
@@ -29,20 +27,22 @@ jobs:
         cd app
         cordova platform add android
 
-        mkdir -p resources
-        
-        # Генерируем картинки правильного размера
+        # ЖЕСТКАЯ ЗАМЕНА ИКОНОК ПРЯМО В ANDROID
         python3 -c "
+        import os
         from PIL import Image
-        # Сплэш 1920x1920 (требование Cordova)
-        Image.new('RGB', (1920, 1920), '#0a0a0a').save('resources/splash.png')
-        # Иконка 1024x1024 (из нашей 512)
-        icon = Image.open('../assets/icons/icon-512.png')
-        icon.resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
+        sizes = {'mipmap-mdpi': 48, 'mipmap-hdpi': 72, 'mipmap-xhdpi': 96, 'mipmap-xxhdpi': 144, 'mipmap-xxxhdpi': 192}
+        img = Image.open('../assets/icons/icon-512.png')
+        for folder, size in sizes.items():
+            resized = img.resize((size, size), Image.Resampling.LANCZOS)
+            path = f'platforms/android/app/src/main/res/{folder}'
+            os.makedirs(path, exist_ok=True)
+            resized.save(f'{path}/ic_launcher.png')
+            resized.save(f'{path}/ic_launcher_round.png')
         "
 
-        # Генерируем иконки и сплэши для Android
-        cordova-res android --skip-config --copy
+        # УДАЛЯЕМ АДАПТИВНЫЕ ИКОНКИ CORDOVA (чтобы он не перебивал наши PNG)
+        rm -rf platforms/android/app/src/main/res/mipmap-anydpi-v26 || true
 
         # Вставляем наш HTML
         cat > www/index.html << 'EOF'
