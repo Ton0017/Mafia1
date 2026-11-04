@@ -97,6 +97,11 @@ const Wounds = {
       return false;
     }
     inv[medToUse]--;
+    const medData = WoundData.medicine[medToUse];
+    if (medData && medData.healsHp && State.player.body && State.player.body[part]) {
+      State.player.body[part].hp = Math.min(State.player.body[part].max, State.player.body[part].hp + medData.healsHp);
+      Engine.log('Рана обработана (+' + medData.healsHp + ' HP).', 'good');
+    }
 
     if (!Time.spend(data.treatTime, 'Лечение: ' + data.name)) return false;
     if (!State.player || !State.city) return true; // #42
@@ -166,6 +171,80 @@ const Wounds = {
   },
 
   // Купить медикаменты
+  useMedicine(medId) {
+    if (!State.player || !State.player.inventory || !State.player.inventory.medicine) return false;
+    if (typeof WoundData === 'undefined' || !WoundData.medicine) return false;
+    const med = WoundData.medicine[medId];
+    if (!med) return false;
+    if ((State.player.inventory.medicine[medId] || 0) <= 0) {
+      Engine.log('Нет такого медикамента.', 'warn');
+      return false;
+    }
+    if (!Time.canSpend(0.25)) { Engine.log('Слишком поздно.', 'warn'); return false; }
+    
+    let used = false;
+    
+    // Лечение HP (выбираем самую раненую часть)
+    if (med.healsHp && State.player.body) {
+      const parts = Object.keys(State.player.body).filter(p => State.player.body[p].hp < State.player.body[p].max);
+      if (parts.length > 0) {
+        parts.sort((a,b) => (State.player.body[a].hp/State.player.body[a].max) - (State.player.body[b].hp/State.player.body[b].max));
+        const part = parts[0];
+        State.player.body[part].hp = Math.min(State.player.body[part].max, State.player.body[part].hp + med.healsHp);
+        Engine.log('Ты используешь ' + med.name + '. ' + part + ' +' + med.healsHp + ' HP.', 'good');
+        used = true;
+      }
+    }
+    
+    // Энергия
+    if (med.energyBoost) {
+      State.player.survival.energy = Math.min(100, (State.player.survival.energy || 0) + med.energyBoost);
+      Engine.log('Ты чувствуешь прилив сил. +' + med.energyBoost + ' энергии.', 'good');
+      used = true;
+    }
+    
+    // Обезболивание
+    if (med.painkiller) {
+      if (!State.player.dependencies) State.player.dependencies = { activeEffects: [] };
+      if (!State.player.dependencies.activeEffects) State.player.dependencies.activeEffects = [];
+      State.player.dependencies.activeEffects.push({ id: 'painkiller_' + Date.now(), type: 'buff', source: medId, until: Time.totalHours() + (med.duration || 3), data: { painkiller: med.painkiller } });
+      Engine.log('Боль отступает. На время.', 'good');
+      used = true;
+    }
+    
+    // Боевой буст (адреналин)
+    if (med.combatBoost) {
+      State.player.combatBoost = med.combatBoost;
+      Engine.log('Сердце колотится. Готов к драке.', 'good');
+      used = true;
+    }
+    
+    // Жгут (останавливает кровотечение)
+    if (medId === 'tourniquet') {
+      const conds = State.player.conditions || {};
+      for (const part of Object.keys(conds)) {
+        if (conds[part] && conds[part].bleeding) {
+          conds[part].bleeding = false;
+          Engine.log('Жгут наложен. Кровотечение остановлено.', 'good');
+          used = true;
+          break;
+        }
+      }
+    }
+    
+    if (!used) {
+      Engine.log('Этот предмет сейчас не нужен.', 'warn');
+      return false;
+    }
+    
+    State.player.inventory.medicine[medId]--;
+    Time.spend(0.25);
+    if (!State.player || !State.city) return true;
+    Save.save();
+    Engine.render();
+    return true;
+  },
+
   buyMedicine(medId, quantity = 1) {
     if (!State.player || !State.player.inventory) return false;
     if (!State.player.inventory.medicine) State.player.inventory.medicine = {};

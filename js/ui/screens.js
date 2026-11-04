@@ -1391,6 +1391,17 @@ const Screens = {
               </div>`;
             }
           }
+          // Медикаменты
+          for (const [id, count] of Object.entries(p.inventory.medicine || {})) {
+            if (count > 0 && typeof WoundData !== 'undefined' && WoundData.medicine[id]) {
+              html += `<div class="row" style="justify-content:space-between; margin-bottom:4px;">
+                <div class="small">${WoundData.medicine[id].name} (${count} шт)</div>
+                <div>
+                  ${Components.button('Использовать', `Actions.useMedicine('${id}')`, { primary: true })}
+                </div>
+              </div>`;
+            }
+          }
           return html || '<p class="small muted">Пусто. Купи что-нибудь в баре или у дилера.</p>';
         })()}
       `)}
@@ -1669,6 +1680,7 @@ const Actions = {
 
   // Медицина
   buyMedicine(id, q) { if (typeof Wounds !== 'undefined') Wounds.buyMedicine(id, q); },
+  useMedicine(id) { if (typeof Wounds !== 'undefined') Wounds.useMedicine(id); },
   treatCondition(part, injury) { if (typeof Wounds !== 'undefined') Wounds.treat(part, injury); },
 
   // Здания

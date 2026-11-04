@@ -72,15 +72,15 @@ const WoundData = {
 
   // ═══ ЛЕЧЕНИЕ ═══
   medicine: {
-    bandages:    { name: 'Бинт',           price: 50,  healsHp: 10, treatConditions: ['bleeding', 'burn', 'shrapnel'], desc: 'Останавливает кровь, прикрывает рану. На один раз.' },
+    bandages:    { name: 'Бинт',           price: 50,  healsHp: 5, treatConditions: ['bleeding', 'burn', 'shrapnel'], desc: 'Останавливает кровь, прикрывает рану. На один раз.' },
     tourniquet:  { name: 'Жгут',           price: 120, healsHp: 0,  treatConditions: ['bleeding'], healStopsBleed: true, desc: 'Останавливает кровотечение немедленно. Но конечность может отмереть через сутки.' },
-    splint:      { name: 'Шина',           price: 120, healsHp: 5,  treatConditions: ['fracture'], desc: 'Фиксирует кость. Больно, но необходимо.' },
-    painkillers: { name: 'Обезболивающее', price: 80,  healsHp: 0,  painkiller: 50, duration: 4, desc: 'Убирает боль. Не лечит. Не превышай дозу.' },
-    antibiotics: { name: 'Антибиотики',    price: 200, healsHp: 15, treatConditions: ['infected'], desc: 'Убивает заразу. Медленно.' },
-    adrenaline:  { name: 'Адреналин',      price: 300, healsHp: 0,  combatBoost: { initiative: +50, duration: 1 }, sanityCost: 15, desc: 'Сердце колотится. Страх уходит. Ненадолго.' },
-    medkit:      { name: 'Аптечка',        price: 400, healsHp: 30, treatAll: true, desc: 'Полный набор. Дорого. Надёжно.' },
-    vitamins:    { name: 'Витамины',       price: 150, healsHp: 0,  energyBoost: 25, desc: 'Поддержка. Ненадолго.' },
-    stimulant_med: { name: 'Медицинский стимулятор', price: 250, healsHp: 0, energyBoost: 50, sanityCost: 5, desc: 'Для тех, кто не может позволить себе устать.' },
+    splint:      { name: 'Шина',           price: 120, healsHp: 3,  treatConditions: ['fracture'], desc: 'Фиксирует кость. Больно, но необходимо.' },
+    painkillers: { name: 'Обезболивающее', price: 80,  healsHp: 0,  painkiller: 50, duration: 3, desc: 'Убирает боль. Не лечит. Не превышай дозу.' },
+    antibiotics: { name: 'Антибиотики',    price: 200, healsHp: 8, treatConditions: ['infected'], desc: 'Убивает заразу. Медленно.' },
+    adrenaline:  { name: 'Адреналин',      price: 300, healsHp: 0,  combatBoost: { initiative: +30, duration: 1 }, sanityCost: 15, desc: 'Сердце колотится. Страх уходит. Ненадолго.' },
+    medkit:      { name: 'Аптечка',        price: 400, healsHp: 15, treatAll: true, desc: 'Полный набор. Дорого. Надёжно.' },
+    vitamins:    { name: 'Витамины',       price: 150, healsHp: 0,  energyBoost: 15, desc: 'Поддержка. Ненадолго.' },
+    stimulant_med: { name: 'Медицинский стимулятор', price: 250, healsHp: 0, energyBoost: 30, sanityCost: 5, desc: 'Для тех, кто не может позволить себе устать.' },
     detox:       { name: 'Детокс-капельница', price: 2000, healsHp: -20, desc: 'Выводит токсины из крови. Больно. Дорого. Эффективно — сбрасывает все зависимости.' },
   },
 
