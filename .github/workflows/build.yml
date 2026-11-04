@@ -18,9 +18,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova, cordova-res, Pillow
+    - name: Install Cordova and Pillow
       run: |
-        npm install -g cordova cordova-res
+        npm install -g cordova
         pip install Pillow
 
     - name: Create and Build App
@@ -29,29 +29,54 @@ jobs:
         cd app
         cordova platform add android
 
-        # 1. Готовим ресурсы
-        mkdir -p resources/android
+        # 1. ХИРУРГИЧЕСКАЯ ЗАМЕНА ИКОНОК (полностью вручную, без cordova-res)
         python3 -c "
+        import os
         from PIL import Image
-        icon = Image.open('../assets/icons/icon-512.png')
-        icon.resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
-        icon.resize((432, 432), Image.Resampling.LANCZOS).save('resources/android/icon-foreground.png')
-        Image.new('RGB', (432, 432), '#0a0a0a').save('resources/android/icon-background.png')
-        Image.new('RGB', (2732, 2732), '#0a0a0a').save('resources/splash.png')
+        
+        res = 'platforms/android/app/src/main/res'
+        img = Image.open('../assets/icons/icon-512.png')
+
+        # Стандартные размеры иконок
+        sizes = {'mipmap-mdpi': 48, 'mipmap-hdpi': 72, 'mipmap-xhdpi': 96, 'mipmap-xxhdpi': 144, 'mipmap-xxxhdpi': 192}
+        for folder, size in sizes.items():
+            path = os.path.join(res, folder)
+            os.makedirs(path, exist_ok=True)
+            resized = img.resize((size, size), Image.Resampling.LANCZOS)
+            resized.save(os.path.join(path, 'ic_launcher.png'))
+            resized.save(os.path.join(path, 'ic_launcher_round.png'))
+
+        # Адаптивные иконки для Android 8+ (создаем ПРАВИЛЬНЫЕ XML)
+        anydpi = os.path.join(res, 'mipmap-anydpi-v26')
+        os.makedirs(anydpi, exist_ok=True)
+        
+        # Передний план (туз) и задний (черный)
+        fg = img.resize((432, 432), Image.Resampling.LANCZOS)
+        fg.save(os.path.join(res, 'mipmap-xxxhdpi', 'ic_launcher_foreground.png'))
+        bg = Image.new('RGB', (432, 432), '#0a0a0a')
+        bg.save(os.path.join(res, 'mipmap-xxxhdpi', 'ic_launcher_background.png'))
+
+        xml = '''<?xml version=\"1.0\" encoding=\"utf-8\"?>
+        <adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\">
+            <background android:drawable=\"@mipmap/ic_launcher_background\" />
+            <foreground android:drawable=\"@mipmap/ic_launcher_foreground\" />
+        </adaptive-icon>'''
+        
+        with open(os.path.join(anydpi, 'ic_launcher.xml'), 'w') as f: f.write(xml)
+        with open(os.path.join(anydpi, 'ic_launcher_round.xml'), 'w') as f: f.write(xml)
+
+        # Черный экран загрузки
+        for folder in os.listdir(res):
+            if folder.startswith('drawable'):
+                path = os.path.join(res, folder)
+                if os.path.isdir(path):
+                    Image.new('RGB', (1920, 1920), '#0a0a0a').save(os.path.join(path, 'screen.png'))
         "
 
-        # 2. Генерируем иконки и сплэши
-        cordova-res android --skip-config --copy
+        # 2. НАСТРОЙКИ СПЛЭША (отключаем стандартный)
+        sed -i 's|</widget>|  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/mipmap-xxxhdpi/ic_launcher.png" />\n  <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
 
-        # 3. ВАЖНО: НЕ удаляем mipmap-anydpi-v26. Вместо этого перезаписываем файлы внутри.
-        # (cordova-res уже создал правильные XML, но на всякий случай копируем наши PNG поверх)
-        cp resources/android/icon-foreground.png platforms/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_foreground.png || true
-        cp resources/android/icon-background.png platforms/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_background.png || true
-
-        # 4. Настраиваем config.xml для сплэша (указываем правильный путь)
-        sed -i 's|</widget>|  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/splash.png" />\n  <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
-
-        # 5. Вставляем HTML
+        # 3. HTML
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -71,7 +96,7 @@ jobs:
         </html>
         EOF
 
-        # 6. Собираем
+        # 4. Сборка
         cordova clean android
         cordova build android
 
