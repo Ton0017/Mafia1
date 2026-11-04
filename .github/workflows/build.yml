@@ -18,9 +18,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova and Pillow
+    - name: Install Cordova and tools
       run: |
-        npm install -g cordova
+        npm install -g cordova cordova-res
         pip install Pillow
 
     - name: Create Cordova App
@@ -29,24 +29,24 @@ jobs:
         cd app
         cordova platform add android
 
-        # ЖЕСТКАЯ ЗАМЕНА ИКОНОК ПРЯМО В ANDROID
+        mkdir -p resources
+        
+        # Генерируем иконку 1024x1024 и системный сплэш 2732x2732 (черный)
         python3 -c "
-        import os
         from PIL import Image
-        sizes = {'mipmap-mdpi': 48, 'mipmap-hdpi': 72, 'mipmap-xhdpi': 96, 'mipmap-xxhdpi': 144, 'mipmap-xxxhdpi': 192}
-        img = Image.open('../assets/icons/icon-512.png')
-        for folder, size in sizes.items():
-            resized = img.resize((size, size), Image.Resampling.LANCZOS)
-            path = f'platforms/android/app/src/main/res/{folder}'
-            os.makedirs(path, exist_ok=True)
-            resized.save(f'{path}/ic_launcher.png')
-            resized.save(f'{path}/ic_launcher_round.png')
+        # Иконка из нашей 512
+        Image.open('../assets/icons/icon-512.png').resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
+        # Системный сплэш (просто черный, чтобы не было робота)
+        Image.new('RGB', (2732, 2732), '#000000').save('resources/splash.png')
         "
 
-        # УДАЛЯЕМ АДАПТИВНЫЕ ИКОНКИ CORDOVA
-        rm -rf platforms/android/app/src/main/res/mipmap-anydpi-v26 || true
+        # Запускаем официальный генератор (он перезапишет адаптивные иконки и сплэши)
+        cordova-res android --skip-config --copy
 
-        # Вставляем наш HTML
+        # Убираем задержку системного сплэша Cordova, чтобы робот не висел
+        sed -i 's|<preference name="SplashScreenDelay" value="3000" />|<preference name="SplashScreenDelay" value="0" />|g' config.xml || true
+
+        # Вставляем наш HTML со сплэшем
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
