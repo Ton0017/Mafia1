@@ -88,10 +88,10 @@ jobs:
         export PATH="$JAVA_HOME/bin:$PATH"
         cd android
         expect << 'EXPECT_SCRIPT'
-        set timeout 600
+        set timeout 900
         spawn bubblewrap build --skipPwaValidation
         expect {
-          "regenerate your project?" { send "y\r"; exp_continue }
+          "regenerate your project?" { send "n\r"; exp_continue }
           "Enter the password" { send "password123\r"; exp_continue }
           "Accept? (y/N)" { send "y\r"; exp_continue }
           "Do you accept the license" { send "y\r"; exp_continue }
