@@ -18,8 +18,10 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova
-      run: npm install -g cordova
+    - name: Install Cordova and Pillow
+      run: |
+        npm install -g cordova
+        pip install Pillow
 
     - name: Create Cordova App
       run: |
@@ -41,7 +43,7 @@ jobs:
             resized.save(f'{path}/ic_launcher_round.png')
         "
 
-        # УДАЛЯЕМ АДАПТИВНЫЕ ИКОНКИ CORDOVA (чтобы он не перебивал наши PNG)
+        # УДАЛЯЕМ АДАПТИВНЫЕ ИКОНКИ CORDOVA
         rm -rf platforms/android/app/src/main/res/mipmap-anydpi-v26 || true
 
         # Вставляем наш HTML
