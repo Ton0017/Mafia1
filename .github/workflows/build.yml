@@ -29,84 +29,51 @@ jobs:
         cd app
         cordova platform add android
 
-        # 1. Готовим ресурсы для cordova-res
+        # 1. Подготовка ресурсов
         mkdir -p resources/android
         python3 -c "
         from PIL import Image
         icon = Image.open('../assets/icons/icon-512.png')
-        
-        # Основная иконка (1024x1024)
         icon.resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
-        
-        # Для адаптивных иконок Android (432x432) - это убирает робота
         icon.resize((432, 432), Image.Resampling.LANCZOS).save('resources/android/icon-foreground.png')
         Image.new('RGB', (432, 432), '#0a0a0a').save('resources/android/icon-background.png')
-        
-        # Сплэш 2732x2732 (черный)
         Image.new('RGB', (2732, 2732), '#0a0a0a').save('resources/splash.png')
         "
 
-        # 2. Генерируем все иконки и сплэши
+        # 2. Генерируем иконки и сплэши через cordova-res
         cordova-res android --skip-config --copy
 
-        # 3. Вставляем наш HTML с РАЗРЕШЕНИЕМ ДЛЯ IFRAME
+        # 3. УБИВАЕМ РОБОТА НА ИКОНКЕ: удаляем XML-файлы адаптивных иконок Cordova
+        rm -rf platforms/android/app/src/main/res/mipmap-anydpi-v26
+
+        # 4. УБИВАЕМ РОБОТА НА СПЛЭШЕ: создаем нашу картинку для Android 12+
+        mkdir -p platforms/android/app/src/main/res/icons
+        cp ../assets/icons/icon-512.png platforms/android/app/src/main/res/icons/splash_icon.png
+
+        # 5. Настраиваем config.xml
+        sed -i 's|</widget>|  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icons/splash_icon.png" />\n  <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
+
+        # 6. Вставляем наш HTML с разрешением на iframe
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
           <head>
             <meta charset="utf-8">
-            <!-- РАЗРЕШАЕМ ЗАГРУЗКУ САЙТА В IFRAME -->
             <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
-            
             <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
             <title>City of Noir</title>
             <style>
               html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a0a0a; }
               iframe { border: none; width: 100%; height: 100%; }
-              #splash {
-                position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center;
-                z-index: 10000; transition: opacity 0.4s ease;
-              }
-              #splash.fade { opacity: 0; }
-              .splash-title {
-                font-family: 'Press Start 2P', 'Courier New', monospace;
-                font-size: clamp(24px, 9vw, 64px);
-                line-height: 1.8;
-                text-align: center;
-                letter-spacing: 0.15em;
-              }
-              .splash-title span { display: block; }
-              .splash-w { color: #ffffff; text-shadow: 0 0 14px rgba(255,255,255,0.35); }
-              .splash-r { color: #a32626; text-shadow: 0 0 14px rgba(163,38,38,0.55); }
             </style>
-            <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
           </head>
           <body>
-            <div id="splash">
-              <div class="splash-title">
-                <span class="splash-w">CITY</span>
-                <span class="splash-r">OF</span>
-                <span class="splash-w">NOIR</span>
-              </div>
-            </div>
             <iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe>
-            <script>
-              const frame = document.getElementById('game-frame');
-              const splash = document.getElementById('splash');
-              // Скрываем сплэш, когда iframe загрузился
-              frame.onload = () => {
-                setTimeout(() => {
-                  splash.classList.add('fade');
-                  setTimeout(() => splash.remove(), 400);
-                }, 1500);
-              };
-            </script>
           </body>
         </html>
         EOF
 
-        # 4. Собираем чистый APK (предварительно очистив старые сборки)
-        cordova clean android
+        # 7. Собираем APK
         cordova build android
 
     - name: Upload APK
