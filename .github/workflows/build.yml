@@ -21,6 +21,11 @@ jobs:
         echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
         echo "/usr/local/lib/android/sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
+    - name: Accept Licenses & Install Build Tools
+      run: |
+        yes | sdkmanager --licenses || true
+        sdkmanager "platforms;android-34" "build-tools;34.0.0" || true
+
     - name: Install Dependencies
       run: |
         sudo apt-get update && sudo apt-get install -y expect
@@ -35,43 +40,64 @@ jobs:
       run: |
         keytool -genkey -v -keystore android.keystore -alias android -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=Android,O=Android,C=US"
 
-    - name: Init and Build APK
+    - name: Create TWA Manifest
+      run: |
+        mkdir -p android
+        cat > android/twa-manifest.json << 'EOF'
+        {
+          "packageId": "io.github.ton0017.mafia",
+          "host": "ton0017.github.io",
+          "name": "City of Noir",
+          "launcherName": "Noir",
+          "display": "fullscreen",
+          "themeColor": "#000000",
+          "navigationColor": "#000000",
+          "backgroundColor": "#0a0a0a",
+          "startUrl": "/Mafia1/",
+          "iconUrl": "https://ton0017.github.io/Mafia1/assets/icons/icon-512.png",
+          "maskableIconUrl": "https://ton0017.github.io/Mafia1/assets/icons/icon-512.png",
+          "appVersionName": "1.0.0",
+          "appVersionCode": 1,
+          "shortcuts": [],
+          "signingKey": {
+            "path": "../android.keystore",
+            "alias": "android"
+          },
+          "generatorApp": "bubblewrap-cli",
+          "webManifestUrl": "https://ton0017.github.io/Mafia1/manifest.json",
+          "fallbackType": "customtabs",
+          "features": {},
+          "alphaDependencies": {
+            "enabled": false
+          },
+          "enableNotifications": false,
+          "isChromeOS": false,
+          "useBrowser": false
+        }
+        EOF
+
+    - name: Build APK with Expect
       env:
         BUBBLEWRAP_KEYSTORE_PASSWORD: password123
         BUBBLEWRAP_KEY_PASSWORD: password123
       run: |
         export PATH="$JAVA_HOME/bin:$PATH"
-        
-        echo "=== ШАГ 1: ИНИЦИАЛИЗАЦИЯ ПРОЕКТА ==="
-        expect << 'EXPECT_INIT'
-        set stty_init "columns 200"
-        set timeout 600
-        spawn bubblewrap init --manifest=https://ton0017.github.io/Mafia1/manifest.json --directory=android --skipPwaValidation
-        expect {
-            "install the JDK" { send "n\r"; exp_continue }
-            "install the Android SDK" { send "n\r"; exp_continue }
-            "Enter the path to the Android SDK" { send "$env(ANDROID_HOME)\r"; exp_continue }
-            "use the default" { send "y\r"; exp_continue }
-            "Is this correct" { send "y\r"; exp_continue }
-            "regenerate your project" { send "y\r"; exp_continue }
-            eof
-        }
-        EXPECT_INIT
-
-        echo "=== ШАГ 2: СБОРКА APK ==="
         cd android
-        expect << 'EXPECT_BUILD'
+        expect << 'EXPECT_SCRIPT'
         set stty_init "columns 200"
-        set timeout 600
-        spawn bubblewrap build --skipPwaValidation --signingKeyPath=../android.keystore --signingKeyAlias=android
+        set timeout 900
+        spawn bubblewrap build --skipPwaValidation
         expect {
-            "Enter the password" { send "password123\r"; exp_continue }
-            "regenerate your project" { send "n\r"; exp_continue }
-            eof
+          "regenerate" { send "y\r"; exp_continue }
+          "password" { send "password123\r"; exp_continue }
+          "Accept? (y/N)" { send "y\r"; exp_continue }
+          "Do you accept the license" { send "y\r"; exp_continue }
+          timeout { puts "TIMEOUT!"; exit 1 }
+          eof
         }
-        EXPECT_BUILD
+        EXPECT_SCRIPT
         
-        echo "=== ПОИСК APK ==="
+        echo "=== Ищем APK ==="
         find . -name "*.apk"
 
     - name: Upload APK
