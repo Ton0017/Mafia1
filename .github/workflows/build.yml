@@ -28,40 +28,64 @@ jobs:
         cordova create app io.github.ton0017.mafia "City of Noir"
         cd app
         cordova platform add android
+        
+        # 1. Подготовка платформы (создает стандартные файлы)
+        cordova prepare android
 
-        # ИСПРАВЛЯЕМ CONFIG.XML (аудио и отключение системного сплэша)
-        sed -i 's|</widget>|  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n  <preference name="SplashScreenDelay" value="0" />\n</widget>|' config.xml
-
-        # ЖЕСТКАЯ ЗАМЕНА РЕСУРСОВ ПРЯМО В ANDROID
+        # 2. ХИРУРГИЧЕСКОЕ ВМЕШАТЕЛЬСТВО
         python3 -c "
         import os
         from PIL import Image
         
-        base_res = 'platforms/android/app/src/main/res'
+        res_path = 'platforms/android/app/src/main/res'
         
-        # 1. Удаляем адаптивные XML-иконки (чтобы не было робота)
-        os.system(f'rm -rf {base_res}/mipmap-anydpi-v26')
+        # Удаляем адаптивные иконки Cordova (из-за них вылезает робот)
+        os.system(f'rm -rf {res_path}/mipmap-anydpi-v26')
         
-        # 2. Генерируем наши иконки во все размеры
-        img_icon = Image.open('../assets/icons/icon-512.png')
+        # Заменяем иконки на нашего туза
+        img = Image.open('../assets/icons/icon-512.png')
         sizes = {'mipmap-mdpi': 48, 'mipmap-hdpi': 72, 'mipmap-xhdpi': 96, 'mipmap-xxhdpi': 144, 'mipmap-xxxhdpi': 192}
         for folder, size in sizes.items():
-            path = f'{base_res}/{folder}'
+            path = f'{res_path}/{folder}'
             os.makedirs(path, exist_ok=True)
-            resized = img_icon.resize((size, size), Image.Resampling.LANCZOS)
+            resized = img.resize((size, size), Image.Resampling.LANCZOS)
             resized.save(f'{path}/ic_launcher.png')
             resized.save(f'{path}/ic_launcher_round.png')
-            
-        # 3. Генерируем черный сплэш (убиваем робота)
-        for folder in os.listdir(base_res):
+        
+        # Перезаписываем картинку системного сплэша (черный фон)
+        for folder in os.listdir(res_path):
             if folder.startswith('drawable'):
-                path = f'{base_res}/{folder}'
+                path = f'{res_path}/{folder}'
                 if os.path.isdir(path):
                     Image.new('RGB', (1920, 1920), '#000000').save(f'{path}/screen.png')
-                    Image.new('RGB', (1920, 1920), '#000000').save(f'{path}/splash.png')
         "
 
-        # Вставляем наш HTML
+        # 3. ВШИВАЕМ СТИЛИ ДЛЯ ANDROID 12+ (чтобы убрать робота с экрана загрузки)
+        mkdir -p platforms/android/app/src/main/res/values-v31
+        cat > platforms/android/app/src/main/res/values-v31/styles.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <resources>
+            <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+                <item name="windowSplashScreenBackground">#0a0a0a</item>
+                <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+                <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+            </style>
+        </resources>
+        EOF
+
+        # Меняем фон в старых версиях Android
+        cat > platforms/android/app/src/main/res/values/styles.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <resources>
+            <style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">
+                <item name="android:background">#0a0a0a</item>
+            </style>
+        </resources>
+        EOF
+
+        # 4. Настройки звука и HTML
+        sed -i 's|</widget>|  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
+
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -113,10 +137,11 @@ jobs:
         </html>
         EOF
 
-    - name: Build APK
+    - name: Compile APK (Skip Prepare)
       run: |
         cd app
-        cordova build android
+        # ВАЖНО: compile вместо build, чтобы не перезаписал наши иконки!
+        cordova compile android
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
