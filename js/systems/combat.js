@@ -220,6 +220,12 @@ const Combat = {
     const c = State.combat;
     if (!c || !c.active || c.finished || c.turn !== 'player') return { ok: false };
 
+    // Адреналин: одноразовый буст
+    if (State.player.combatBoost && State.player.combatBoost.initiative) {
+      this._log('Сердце колотится. Ты быстрее.', 'good');
+      State.player.combatBoost = null;
+    }
+
     const weapon = Weapons.find(c.playerState.weaponId);
     if (!weapon) return { ok: false };
 

@@ -173,6 +173,10 @@ const Wounds = {
   // Купить медикаменты
   useMedicine(medId) {
     if (!State.player || !State.player.inventory || !State.player.inventory.medicine) return false;
+    if (!State.player.survival) State.player.survival = { hunger: 100, thirst: 100, energy: 100, combatFatigue: 0 };
+    if (!State.player.conditions) State.player.conditions = {};
+    if (!State.player.dependencies) State.player.dependencies = { activeEffects: [] };
+    if (!State.player.dependencies.activeEffects) State.player.dependencies.activeEffects = [];
     if (typeof WoundData === 'undefined' || !WoundData.medicine) return false;
     const med = WoundData.medicine[medId];
     if (!med) return false;
@@ -219,6 +223,23 @@ const Wounds = {
       used = true;
     }
     
+    // Снимаем травму, если предмет лечит condition и через инвентарь
+    if (med.treatConditions && Array.isArray(med.treatConditions)) {
+      for (const part of Object.keys(State.player.conditions)) {
+        const cond = State.player.conditions[part];
+        if (!cond) continue;
+        for (const inj of med.treatConditions) {
+          if (cond[inj]) {
+            cond[inj] = false;
+            Engine.log('Ты обработал ' + inj + '.', 'good');
+            used = true;
+            break;
+          }
+        }
+        if (used) break;
+      }
+    }
+
     // Жгут (останавливает кровотечение)
     if (medId === 'tourniquet') {
       const conds = State.player.conditions || {};
