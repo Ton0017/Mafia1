@@ -28,13 +28,7 @@ jobs:
         cordova create app io.github.ton0017.mafia "City of Noir"
         cd app
 
-        python3 -c "
-        import json
-        with open('package.json', 'r') as f: pkg = json.load(f)
-        pkg['type'] = 'commonjs'
-        with open('package.json', 'w') as f: json.dump(pkg, f, indent=2)
-        "
-
+        python3 -c "import json; pkg = json.load(open('package.json')); pkg['type']='commonjs'; json.dump(pkg, open('package.json','w'), indent=2)"
         rm -rf ~/.cordova ~/.plugman
         cordova platform add android
 
@@ -60,7 +54,6 @@ jobs:
             draw.line([(margin+w-35, margin+h-15), (margin+w-50, margin+h-40)], fill=(10, 10, 10, 255), width=lw)
             draw.line([(margin+w-27, margin+h-30), (margin+w-43, margin+h-30)], fill=(10, 10, 10, 255), width=lw)
             return img
-
         main_icon = Image.new('RGB', (1024, 1024), (10, 10, 10))
         main_icon.paste(draw_ace(1024), (0,0), draw_ace(1024))
         main_icon.save('resources/icon.png')
@@ -70,47 +63,19 @@ jobs:
         splash.paste(main_icon.resize((1024, 1024), Image.Resampling.LANCZOS), ((2732-1024)//2, (2732-1024)//2))
         splash.save('resources/splash.png')
         "
-
         cordova-res android --skip-config --copy
 
         sed -i 's|</widget>|  <platform name="android">\n    <icon background="resources/android/icon-background.png" density="mdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="hdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxxhdpi" foreground="resources/android/icon-foreground.png" />\n    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/splash.png" />\n    <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  </platform>\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
 
-        cat > www/index.html << 'EOF'
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
-            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-            <title>City of Noir</title>
-            <style>html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a0a0a; } iframe { border: none; width: 100%; height: 100%; }</style>
-          </head>
-          <body><iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe></body>
-        </html>
-        EOF
+        printf '%s\n' '<!DOCTYPE html>' '<html>' '<head>' '<meta charset="utf-8">' '<meta http-equiv="Content-Security-Policy" content="default-src * '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"'; script-src * '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"'; connect-src * '"'"'unsafe-inline'"'"'; img-src * data: blob: '"'"'unsafe-inline'"'"'; frame-src *; style-src * '"'"'unsafe-inline'"'"';">' '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">' '<title>City of Noir</title>' '<style>html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a0a0a; } iframe { border: none; width: 100%; height: 100%; }</style>' '</head>' '<body><iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe></body>' '</html>' > www/index.html
 
-        # 1. Создаем ключ (в папке android/app)
         cd platforms/android/app
         keytool -genkey -v -keystore release.keystore -alias noir -keyalg RSA -keysize 2048 -validity 10000 -storepass noirpassword -keypass noirpassword -dname "CN=City of Noir, O=Indie, C=RU" || true
         cd ../../..
 
-        # 2. Создаем build.json для автоматической подписи Cordova
-        cat > build.json << 'EOF'
-        {
-          "android": {
-            "release": {
-              "keystore": "platforms/android/app/release.keystore",
-              "storePassword": "noirpassword",
-              "alias": "noir",
-              "password": "noirpassword"
-            }
-          }
-        }
-        EOF
+        printf '%s\n' '{' '  "android": {' '    "release": {' '      "keystore": "platforms/android/app/release.keystore",' '      "storePassword": "noirpassword",' '      "alias": "noir",' '      "password": "noirpassword"' '    }' '  }' '}' > build.json
 
-        # 3. Собираем APK (Cordova сама его подпишет и положит в release)
         cordova build android --release --packageType=apk --buildConfig=build.json
-        
         echo "=== НАЙДЕННЫЕ APK ==="
         find platforms/android/app/build/outputs -name "*.apk" -o -name "*.aab" || true
 
@@ -118,5 +83,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: CityOfNoir-Release-APK
-        path: app/platforms/android/app/build/outputs/apk/**/*.apk
+        path: app/platforms/android/app/build/outputs/**/*.apk
         if-no-files-found: error
