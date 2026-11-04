@@ -18,7 +18,7 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Cordova, cordova-res, Pillow
+    - name: Install Cordova and cordova-res
       run: |
         npm install -g cordova cordova-res
         pip install Pillow
@@ -27,26 +27,29 @@ jobs:
       run: |
         cordova create app io.github.ton0017.mafia "City of Noir"
         cd app
-        
-        # Добавляем платформу и официальный плагин для сплэша
         cordova platform add android
-        cordova plugin add cordova-plugin-splashscreen
-        
-        # Генерируем ресурсы (иконка и черный фон для нативного сплэша)
-        mkdir -p resources
+
+        # 1. Готовим все ресурсы для cordova-res
+        mkdir -p resources/android
         python3 -c "
         from PIL import Image
-        Image.open('../assets/icons/icon-512.png').resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
+        icon = Image.open('../assets/icons/icon-512.png')
+        # Основная иконка
+        icon.resize((1024, 1024), Image.Resampling.LANCZOS).save('resources/icon.png')
+        # Адаптивные иконки (передний и задний план)
+        icon.resize((432, 432), Image.Resampling.LANCZOS).save('resources/android/icon-foreground.png')
+        Image.new('RGB', (432, 432), '#0a0a0a').save('resources/android/icon-background.png')
+        # Сплэш 2732x2732 (черный)
         Image.new('RGB', (2732, 2732), '#0a0a0a').save('resources/splash.png')
         "
-        
-        # Применяем иконки ко всем версиям Android (включая адаптивные)
+
+        # 2. Генерируем иконки для Android
         cordova-res android --skip-config --copy
 
-        # Настраиваем config.xml: задержка 0, чтобы робот не висел, и автоскрытие отключено (скроем сами)
-        sed -i 's|</widget>|  <preference name="AutoHideSplashScreen" value="false" />\n  <preference name="SplashScreenDelay" value="0" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
+        # 3. Настраиваем config.xml: убиваем робота на сплэше
+        sed -i 's|</widget>|  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icon/android/icon-foreground.png" />\n  <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
 
-        # Вставляем наш HTML
+        # 4. Вставляем наш HTML
         cat > www/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -85,24 +88,20 @@ jobs:
             </div>
             <iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe>
             <script>
-              document.addEventListener('deviceready', () => {
-                if (navigator.splashscreen) navigator.splashscreen.hide();
-                
-                const frame = document.getElementById('game-frame');
-                const splash = document.getElementById('splash');
-                frame.onload = () => {
-                  setTimeout(() => {
-                    splash.classList.add('fade');
-                    setTimeout(() => splash.remove(), 400);
-                  }, 1500);
-                };
-              });
+              const frame = document.getElementById('game-frame');
+              const splash = document.getElementById('splash');
+              frame.onload = () => {
+                setTimeout(() => {
+                  splash.classList.add('fade');
+                  setTimeout(() => splash.remove(), 400);
+                }, 1500);
+              };
             </script>
           </body>
         </html>
         EOF
 
-        # Собираем
+        # 5. Собираем
         cordova build android
 
     - name: Upload APK
