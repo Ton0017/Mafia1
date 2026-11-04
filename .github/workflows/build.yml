@@ -1,7 +1,5 @@
 name: Build APK
 on: push
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,22 +17,11 @@ jobs:
       run: |
         echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-        echo "/usr/local/lib/android/sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
     - name: Accept Licenses & Install Build Tools
       run: |
         yes | sdkmanager --licenses || true
         sdkmanager "platforms;android-34" "build-tools;34.0.0" || true
-
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update && sudo apt-get install -y expect
-        npm install -g @bubblewrap/cli
-
-    - name: Configure Bubblewrap
-      run: |
-        mkdir -p ~/.bubblewrap
-        echo '{"jdkPath":"'"$JAVA_HOME"'","androidSdkPath":"/usr/local/lib/android/sdk/cmdline-tools/latest"}' > ~/.bubblewrap/config.json
 
     - name: Generate Keystore
       run: |
@@ -76,29 +63,16 @@ jobs:
         }
         EOF
 
-    - name: Build APK with Expect
+    - name: Build APK inside Docker
       env:
         BUBBLEWRAP_KEYSTORE_PASSWORD: password123
         BUBBLEWRAP_KEY_PASSWORD: password123
       run: |
-        export PATH="$JAVA_HOME/bin:$PATH"
-        cd android
-        expect << 'EXPECT_SCRIPT'
-        set stty_init "columns 200"
-        set timeout 900
-        spawn bubblewrap build --skipPwaValidation
-        expect {
-          "regenerate" { send "y\r"; exp_continue }
-          "password" { send "password123\r"; exp_continue }
-          "Accept? (y/N)" { send "y\r"; exp_continue }
-          "Do you accept the license" { send "y\r"; exp_continue }
-          timeout { puts "TIMEOUT!"; exit 1 }
-          eof
-        }
-        EXPECT_SCRIPT
-        
-        echo "=== Ищем APK ==="
-        find . -name "*.apk"
+        docker run --rm \
+          -v ${{ github.workspace }}:/app \
+          -w /app \
+          ghcr.io/googlechromelabs/bubblewrap:latest \
+          build --skipPwaValidation
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
