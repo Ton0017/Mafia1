@@ -37,7 +37,11 @@ const Music = {
       }
     }, 3000);
 
-    try { if (localStorage.getItem('noir_audio') === 'on') this.enabled = true; } catch (e) {}
+    // По умолчанию музыка выключена, чтобы не было конфликтов с WebView
+    // Включается только вручную кнопкой ♪
+    try { 
+      if (localStorage.getItem('noir_audio') === 'on') this.enabled = true; 
+    } catch (e) {}
   },
 
   start() {
