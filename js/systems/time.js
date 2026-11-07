@@ -58,6 +58,69 @@ const Time = {
     if (typeof EventsSystem !== 'undefined' && EventsSystem.tick) EventsSystem.tick();
   },
 
+
+  _printNewspaper() {
+    const lines = [];
+    
+    // 1. МЭР — про налоги/порядки
+    if (typeof Politics !== 'undefined' && State.mayor) {
+      const m = State.mayor;
+      if (m.type === 'corrupt') lines.push('Мэр ' + m.name + ' снова снизил налоги для богатых. Бедные не заметили.');
+      else if (m.type === 'honest') lines.push('Мэр ' + m.name + ' объявил войну уличной преступности. Копы работают сверхурочно.');
+      else if (m.type === 'paranoid') lines.push('Мэр ' + m.name + ' подозревает заговор. Он сменил охрану третий раз за месяц.');
+      else lines.push('Мэрия ' + m.name + ' обещает перемены. Как обычно.');
+    }
+    
+    // 2. ФРАКЦИИ — самая сильная и самая слабая
+    if (State.factions && State.factions.length > 0) {
+      const nonPolice = State.factions.filter(f => !f.isPolice);
+      if (nonPolice.length > 0) {
+        const strongest = nonPolice.reduce((a, b) => (a.zones || 0) > (b.zones || 0) ? a : b);
+        const weakest = nonPolice.reduce((a, b) => (a.zones || 0) < (b.zones || 0) ? a : b);
+        if (strongest && (strongest.zones || 0) > 0) {
+          lines.push(strongest.name + ' набирает силу — уже ' + strongest.zones + ' зон под контролем.');
+        }
+        if (weakest && weakest !== strongest && (weakest.zones || 0) <= 1) {
+          lines.push(weakest.name + ' дышит на ладан. Их почти выдавили с улиц.');
+        }
+      }
+    }
+    
+    // 3. ИГРОК — слухи о тебе
+    const p = State.player;
+    if (p.heat > 50) lines.push('Полиция ищет человека. Приметы не разглашаются. Слухи — самые разные.');
+    else if (p.heat > 20) lines.push('Копы патрулируют чаще. Люди шепчутся — кто-то засветился.');
+    else if (p.reputation > 80) lines.push('В городе говорят о тебе с уважением. Даже копы здороваются.');
+    else if (p.reputation > 30) lines.push('Твоё имя упоминают в барах. Пока нейтрально.');
+    
+    // 4. КРИМИНАЛЬНАЯ СВОДКА
+    if (p.lifetime && p.lifetime.kills > 0) {
+      const yesterday = Utils.chance(0.5);
+      if (yesterday) lines.push('На Приморской нашли тело. Полиция ищет свидетелей. Свидетелей нет.');
+    }
+    
+    // 5. МЕЛКИЕ СЛУХИ
+    const rumors = [
+      'Бармен из «Крысы» снова жалуется на посетителей. Говорят, кто-то не платит.',
+      'На рынке поднялись цены. Торговцы ссылаются на банды.',
+      'В порту опять что-то выгружали ночью. Таможня сделала вид, что не заметила.',
+      'Умер старик, который знал всех. Похороны завтра.',
+      'Кто-то видел мэра в баре. Не в том, что в центре.',
+      'Говорят, в тюрьме сидит человек, который знает имя убийцы прокурора.',
+      'Старый Кадиллак у мэрии стоит третий день. Никто не знает, чей он.',
+    ];
+    lines.push(Utils.pick(rumors));
+    
+    // Вывод: 3-4 строки, не больше
+    if (lines.length > 0) {
+      Engine.log('📰 ГАЗЕТА «НОКТАУН ТАЙМС»', 'lore');
+      const shown = lines.slice(0, 4);
+      for (const line of shown) {
+        Engine.log('  ▸ ' + line, 'lore');
+      }
+    }
+  },
+
   onNewDay() {
     if (!State.player) return;
     if (!State.player.lifetime) State.player.lifetime = { kills: 0, moneyEarned: 0, missionsDone: 0, daysSurvived: 0, deaths: 0, overdoses: 0, breakdowns: 0 };
@@ -95,6 +158,11 @@ const Time = {
     // Лёгкое восстановление рассудка за ночь в безопасности
     if (State.player.sanity.sanity < 100 && Utils.chance(0.5)) {
       State.player.sanity.sanity = Math.min(100, State.player.sanity.sanity + 2);
+    }
+
+    // ═══ УТРЕННЯЯ ГАЗЕТА ═══
+    if (State.city) {
+      this._printNewspaper();
     }
 
     // Естественное снижение зависимости
