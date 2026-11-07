@@ -595,6 +595,266 @@ const EventData = {
       { text: 'Смотреть', effect: 'city_fire_watch' },
       { text: 'Уйти', effect: 'city_fire_leave' }
     ] },
+
+    // ═══ БЛОК 3: ВОЙНЫ БАНД ═══
+    { id: 'war_convoy', title: 'Конвой', desc: 'Колонна из трёх машин перевозит товар конкурентов. Охраны мало. Ты знаешь маршрут.', choices: [
+      { text: 'Напасть', effect: 'war_convoy_attack' },
+      { text: 'Сообщить копам', effect: 'war_convoy_cops' },
+      { text: 'Пропустить', effect: 'war_convoy_ignore' }
+    ] },
+    { id: 'war_sniper', title: 'Снайпер на крыше', desc: 'Кто-то засел на крыше и методично отстреливает твоих людей. Ты видишь блик оптики.', choices: [
+      { text: 'Зайти сзади', effect: 'war_sniper_flank' },
+      { text: 'Вызвать огонь', effect: 'war_sniper_fire' },
+      { text: 'Уйти', effect: 'war_sniper_leave' }
+    ] },
+    { id: 'war_molotov', title: 'Коктейль Молотова', desc: 'В окно твоего бара летит бутылка с зажигательной смесью. Пламя охватывает стену.', choices: [
+      { text: 'Тушить', effect: 'war_molotov_fire' },
+      { text: 'Бежать', effect: 'war_molotov_run' },
+      { text: 'Искать нападавшего', effect: 'war_molotov_hunt' }
+    ] },
+    { id: 'war_boss', title: 'Враг на районе', desc: 'Глава враждебной банды замечен в твоем районе. Без охраны. Это шанс.', choices: [
+      { text: 'Убить', effect: 'war_boss_kill' },
+      { text: 'Захватить', effect: 'war_boss_capture' },
+      { text: 'Проследить', effect: 'war_boss_follow' }
+    ] },
+    { id: 'war_bomb', title: 'Бомба', desc: 'Под сиденьем машины найдено взрывное устройство. Таймер тикает.', choices: [
+      { text: 'Обезвредить', effect: 'war_bomb_defuse' },
+      { text: 'Выпрыгнуть', effect: 'war_bomb_jump' },
+      { text: 'Отогнать', effect: 'war_bomb_drive' }
+    ] },
+    { id: 'war_truce', title: 'Перемирие', desc: 'Две банды сели за стол переговоров. Ты — посредник. Если начнётся стрельба, виноват будешь ты.', choices: [
+      { text: 'Мир', effect: 'war_truce_peace' },
+      { text: 'Спровоцировать', effect: 'war_truce_provoke' },
+      { text: 'Убить обоих', effect: 'war_truce_kill' }
+    ] },
+    { id: 'war_armored', title: 'Бронированный грузовик', desc: 'Машина инкассаторов с деньгами конкурентов. Тяжёлая броня, но люди внутри не ожидают нападения.', choices: [
+      { text: 'Взрывчатка', effect: 'war_armored_explosive' },
+      { text: 'Заблокировать', effect: 'war_armored_block' },
+      { text: 'Не связываться', effect: 'war_armored_ignore' }
+    ] },
+    { id: 'war_hostage', title: 'Заложник', desc: 'Твои люди взяли заложника. Он сын прокурора. Ты знаешь, что делать с такими.', choices: [
+      { text: 'Требовать выкуп', effect: 'war_hostage_ransom' },
+      { text: 'Отпустить', effect: 'war_hostage_release' },
+      { text: 'Убить', effect: 'war_hostage_kill' }
+    ] },
+    { id: 'war_driveby', title: 'Драйв-бай', desc: 'Машина проносится мимо, поливая всё свинцом. Тебя задело.', choices: [
+      { text: 'Открыть ответный огонь', effect: 'war_driveby_return' },
+      { text: 'Спрятаться', effect: 'war_driveby_hide' },
+      { text: 'Запомнить номер', effect: 'war_driveby_plate' }
+    ] },
+    { id: 'war_flame', title: 'Поджог', desc: 'Твой склад горит. Кто-то поджёг его со всех сторон. Пламя видно с другого конца города.', choices: [
+      { text: 'Спасать товар', effect: 'war_flame_save' },
+      { text: 'Спасать людей', effect: 'war_flame_people' },
+      { text: 'Позвонить в пожарную', effect: 'war_flame_call' }
+    ] },
+
+    // ═══ БЛОК 3: ОРУЖИЕ ═══
+    { id: 'wpn_case', title: 'Чемодан с оружием', desc: 'В заброшенном доме ты находишь чемодан. Внутри — новый пистолет с глушителем. Ещё в масле.', choices: [
+      { text: 'Забрать', effect: 'wpn_case_take' },
+      { text: 'Продать', effect: 'wpn_case_sell' },
+      { text: 'Оставить', effect: 'wpn_case_leave' }
+    ] },
+    { id: 'wpn_broken', title: 'Осечка', desc: 'В самый ответственный момент твоего пистолета подводит. Ты слышишь щелчок вместо выстрела.', choices: [
+      { text: 'Чинить', effect: 'wpn_broken_fix' },
+      { text: 'Выбросить', effect: 'wpn_broken_throw' },
+      { text: 'Бросить в врага', effect: 'wpn_broken_throw_weapon' }
+    ] },
+    { id: 'wpn_custom', title: 'Кастомный ствол', desc: 'Оружейник предлагает тебе уникальную сборку. Она будет стрелять лучше любого серийного.', choices: [
+      { text: 'Купить', effect: 'wpn_custom_buy' },
+      { text: 'Отказаться', effect: 'wpn_custom_refuse' },
+      { text: 'Забрать бесплатно', effect: 'wpn_custom_take' }
+    ] },
+    { id: 'wpn_cache', title: 'Тайник', desc: 'На старом складе спрятана партия автоматов. Владелец умер год назад. Ты знаешь, где это.', choices: [
+      { text: 'Забрать', effect: 'wpn_cache_take' },
+      { text: 'Продать', effect: 'wpn_cache_sell' },
+      { text: 'Оставить', effect: 'wpn_cache_leave' }
+    ] },
+    { id: 'wpn_silencer', title: 'Глушитель', desc: 'Знакомый предлагает глушитель. Дешёво. Но что-то в его предложении кажется подозрительным.', choices: [
+      { text: 'Купить', effect: 'wpn_silencer_buy' },
+      { text: 'Проверить', effect: 'wpn_silencer_check' },
+      { text: 'Отказаться', effect: 'wpn_silencer_refuse' }
+    ] },
+    { id: 'wpn_cop_gun', title: 'Коповский ствол', desc: 'На месте перестрелки ты находишь пистолет с номером, который сдал бы на экспертизу любой коп.', choices: [
+      { text: 'Забрать', effect: 'wpn_cop_gun_take' },
+      { text: 'Подбросить', effect: 'wpn_cop_gun_plant' },
+      { text: 'Выбросить', effect: 'wpn_cop_gun_throw' }
+    ] },
+    { id: 'wpn_explosives', title: 'Взрывчатка', desc: 'В багажнике — связка динамита. Осталась от каких-то старых дел. Таймер был отключён.', choices: [
+      { text: 'Оставить', effect: 'wpn_explosives_keep' },
+      { text: 'Продать', effect: 'wpn_explosives_sell' },
+      { text: 'Уничтожить', effect: 'wpn_explosives_destroy' }
+    ] },
+    { id: 'wpn_blackmarket', title: 'Чёрный рынок', desc: 'В подвале продают всё, что стреляет. Тебе предлагают снайперскую винтовку без лицензии.', choices: [
+      { text: 'Купить', effect: 'wpn_blackmarket_buy' },
+      { text: 'Торговаться', effect: 'wpn_blackmarket_bargain' },
+      { text: 'Ограбить', effect: 'wpn_blackmarket_rob' }
+    ] },
+    { id: 'wpn_ammo', title: 'Редкие патроны', desc: 'Кто-то продаёт пули, которые пробивают бронежилеты. Такие не купишь в обычном магазине.', choices: [
+      { text: 'Купить', effect: 'wpn_ammo_buy' },
+      { text: 'Узнать, откуда они', effect: 'wpn_ammo_ask' },
+      { text: 'Отказаться', effect: 'wpn_ammo_refuse' }
+    ] },
+    { id: 'wpn_jam', title: 'Клинок в стволе', desc: 'Пистолет заклинило. Ты дёргаешь затвор, но безрезультатно. Враги приближаются.', choices: [
+      { text: 'Чинить', effect: 'wpn_jam_fix' },
+      { text: 'Драться кулаками', effect: 'wpn_jam_fight' },
+      { text: 'Бежать', effect: 'wpn_jam_run' }
+    ] },
+
+    // ═══ БЛОК 3: МАШИНЫ ═══
+    { id: 'car_stolen', title: 'Угнанная тачка', desc: 'У тротуара стоит Кадиллак. Ключи в замке. Владельца нет. Или он скоро вернётся.', choices: [
+      { text: 'Угнать', effect: 'car_stolen_steal' },
+      { text: 'Подождать', effect: 'car_stolen_wait' },
+      { text: 'Проверить', effect: 'car_stolen_check' }
+    ] },
+    { id: 'car_race', title: 'Уличная гонка', desc: 'На светофоре рядом с тобой останавливается Мустанг. Водитель смотрит на тебя с вызовом.', choices: [
+      { text: 'Гонять', effect: 'car_race_race' },
+      { text: 'Игнорировать', effect: 'car_race_ignore' },
+      { text: 'Стрелять', effect: 'car_race_shoot' }
+    ] },
+    { id: 'car_bomb', title: 'Бомба в машине', desc: 'Ты заводишь двигатель. Под сиденьем что-то щёлкает. Ты видишь красный огонёк.', choices: [
+      { text: 'Выйти', effect: 'car_bomb_exit' },
+      { text: 'Гнать', effect: 'car_bomb_drive' },
+      { text: 'Искать', effect: 'car_bomb_search' }
+    ] },
+    { id: 'car_tire', title: 'Прокол', desc: 'Посреди промзоны у тебя спускает колесо. Ночью. В одиночестве.', choices: [
+      { text: 'Менять', effect: 'car_tire_fix' },
+      { text: 'Идти пешком', effect: 'car_tire_walk' },
+      { text: 'Ждать', effect: 'car_tire_wait' }
+    ] },
+    { id: 'car_custom', title: 'Салон', desc: 'Владелец салона предлагает тебе "неучтённую" машину из своей коллекции.', choices: [
+      { text: 'Купить', effect: 'car_custom_buy' },
+      { text: 'Угнать', effect: 'car_custom_steal' },
+      { text: 'Отказаться', effect: 'car_custom_refuse' }
+    ] },
+    { id: 'car_chopshop', title: 'Разборка', desc: 'Ты находишь подпольную разборку. Здесь исчезают машины со всего города. И твои тоже.', choices: [
+      { text: 'Сжечь', effect: 'car_chopshop_burn' },
+      { text: 'Договориться', effect: 'car_chopshop_deal' },
+      { text: 'Ограбить', effect: 'car_chopshop_rob' }
+    ] },
+    { id: 'car_chase', title: 'Погоня', desc: 'В зеркалах заднего вида — мигалки. Копы хотят поговорить. Ты не хочешь.', choices: [
+      { text: 'Уходить', effect: 'car_chase_escape' },
+      { text: 'Остановиться', effect: 'car_chase_stop' },
+      { text: 'Стрелять', effect: 'car_chase_shoot' }
+    ] },
+    { id: 'car_crash', title: 'Авария', desc: 'Водитель впереди резко тормозит. Ты врезаешься. Из машины выходят трое.', choices: [
+      { text: 'Извиниться', effect: 'car_crash_apologize' },
+      { text: 'Заплатить', effect: 'car_crash_pay' },
+      { text: 'Драться', effect: 'car_crash_fight' }
+    ] },
+    { id: 'car_engine', title: 'Двигатель сдох', desc: 'Машина глохнет на полном ходу. Посреди опасного района. Тебе нужно срочно убраться.', choices: [
+      { text: 'Ремонтировать', effect: 'car_engine_fix' },
+      { text: 'Бросить', effect: 'car_engine_abandon' },
+      { text: 'Угнать другую', effect: 'car_engine_steal' }
+    ] },
+    { id: 'car_jack', title: 'Карджеккинг', desc: 'На перекрёстке в твою машину стучат. Человек с пистолетом хочет "поговорить".', choices: [
+      { text: 'Дать по газам', effect: 'car_jack_escape' },
+      { text: 'Отдать ключи', effect: 'car_jack_give' },
+      { text: 'Драться', effect: 'car_jack_fight' }
+    ] },
+
+    // ═══ БЛОК 3: ПОКЕР И АЗАРТ ═══
+    { id: 'pkr_highstakes', title: 'Высокие ставки', desc: 'За столом — люди с толстыми кошельками. Игра идёт на большие деньги. Ты можешь сесть.', choices: [
+      { text: 'Сесть', effect: 'pkr_highstakes_play' },
+      { text: 'Наблюдать', effect: 'pkr_highstakes_watch' },
+      { text: 'Уйти', effect: 'pkr_highstakes_leave' }
+    ] },
+    { id: 'pkr_dice', title: 'Кости', desc: 'В переулке играют в кости. Кажется, кости не простые. Ты видишь, как один из игроков подкручивает.', choices: [
+      { text: 'Сорвать игру', effect: 'pkr_dice_expose' },
+      { text: 'Присоединиться', effect: 'pkr_dice_join' },
+      { text: 'Пройти мимо', effect: 'pkr_dice_leave' }
+    ] },
+    { id: 'pkr_heist', title: 'Казино', desc: 'Подпольное казино в особняке. Охраны много, но вентиляция слабая. Ты знаешь, где сейф.', choices: [
+      { text: 'Ограбить', effect: 'pkr_heist_rob' },
+      { text: 'Играть', effect: 'pkr_heist_play' },
+      { text: 'Сдать копам', effect: 'pkr_heist_cops' }
+    ] },
+    { id: 'pkr_shark', title: 'Ростовщик', desc: 'Человек с улыбкой акулы предлагает тебе деньги под проценты. Большие деньги. Под очень большие проценты.', choices: [
+      { text: 'Взять', effect: 'pkr_shark_take' },
+      { text: 'Отказаться', effect: 'pkr_shark_refuse' },
+      { text: 'Ограбить', effect: 'pkr_shark_rob' }
+    ] },
+    { id: 'pkr_marked', title: 'Меченые карты', desc: 'Ты видишь на столе карты. На рубашках — микроскопические пометки. Кто-то жульничает.', choices: [
+      { text: 'Сказать', effect: 'pkr_marked_tell' },
+      { text: 'Использовать', effect: 'pkr_marked_use' },
+      { text: 'Уйти', effect: 'pkr_marked_leave' }
+    ] },
+    { id: 'pkr_streak', title: 'Полоса', desc: 'Ты проигрываешь третий раз подряд. Пора остановиться. Но ты знаешь, что следующий — точно твой.', choices: [
+      { text: 'Играть дальше', effect: 'pkr_streak_continue' },
+      { text: 'Остановиться', effect: 'pkr_streak_stop' },
+      { text: 'Взять кредит', effect: 'pkr_streak_loan' }
+    ] },
+    { id: 'pkr_win', title: 'Крупный куш', desc: 'Ты сорвал банк. За столом воцарилась тишина. Все смотрят на тебя.', choices: [
+      { text: 'Забрать деньги', effect: 'pkr_win_take' },
+      { text: 'Оставить чаевые', effect: 'pkr_win_tip' },
+      { text: 'Поставить всё', effect: 'pkr_win_allin' }
+    ] },
+    { id: 'pkr_cheat', title: 'Жулик', desc: 'Один из игроков явно жульничает. Остальные либо не видят, либо заодно с ним.', choices: [
+      { text: 'Сдать его', effect: 'pkr_cheat_expose' },
+      { text: 'Шантажировать', effect: 'pkr_cheat_blackmail' },
+      { text: 'Сделать вид, что не заметил', effect: 'pkr_cheat_ignore' }
+    ] },
+    { id: 'pkr_fight', title: 'Подпольные бои', desc: 'В подвале дерутся люди. На кону — деньги. Ты можешь поставить или выйти на ринг.', choices: [
+      { text: 'Поставить', effect: 'pkr_fight_bet' },
+      { text: 'Драться', effect: 'pkr_fight_fight' },
+      { text: 'Уйти', effect: 'pkr_fight_leave' }
+    ] },
+    { id: 'pkr_roulette', title: 'Русская рулетка', desc: 'Шесть человек. Один револьвер. Один патрон. На кону — твоя жизнь или чья-то ещё.', choices: [
+      { text: 'Играть', effect: 'pkr_roulette_play' },
+      { text: 'Застрелить ведущего', effect: 'pkr_roulette_shoot' },
+      { text: 'Уйти', effect: 'pkr_roulette_leave' }
+    ] },
+
+    // ═══ БЛОК 3: КРИМИНАЛ ═══
+    { id: 'crm_bank', title: 'Банк', desc: 'В центре города — банк. Охрана слабая. Ты знаешь, что внутри много наличных.', choices: [
+      { text: 'Ограбить', effect: 'crm_bank_rob' },
+      { text: 'Наводка', effect: 'crm_bank_tip' },
+      { text: 'Пройти мимо', effect: 'crm_bank_leave' }
+    ] },
+    { id: 'crm_jewelry', title: 'Ювелирный', desc: 'Витрина ломится от золота. Владелец — старик. Охраны нет. Сигнализация есть.', choices: [
+      { text: 'Ограбить', effect: 'crm_jewelry_rob' },
+      { text: 'Купить', effect: 'crm_jewelry_buy' },
+      { text: 'Уйти', effect: 'crm_jewelry_leave' }
+    ] },
+    { id: 'crm_blackmail', title: 'Шантаж', desc: 'У тебя есть компромат на одного из политиков. Фото, документы. Целое состояние.', choices: [
+      { text: 'Использовать', effect: 'crm_blackmail_use' },
+      { text: 'Продать', effect: 'crm_blackmail_sell' },
+      { text: 'Сжечь', effect: 'crm_blackmail_burn' }
+    ] },
+    { id: 'crm_extortion', title: 'Рэкет', desc: 'Ты заходишь в бар, где недавно сменился владелец. Молодой. Не понимает правил.', choices: [
+      { text: 'Требовать', effect: 'crm_extortion_demand' },
+      { text: 'Предложить защиту', effect: 'crm_extortion_protect' },
+      { text: 'Уйти', effect: 'crm_extortion_leave' }
+    ] },
+    { id: 'crm_smuggle', title: 'Контрабанда', desc: 'Нужно перевезти ящик через границу. Ты не знаешь, что внутри. Но платят хорошо.', choices: [
+      { text: 'Везти', effect: 'crm_smuggle_transport' },
+      { text: 'Посмотреть', effect: 'crm_smuggle_check' },
+      { text: 'Отказаться', effect: 'crm_smuggle_refuse' }
+    ] },
+    { id: 'crm_kidnap', title: 'Похищение', desc: 'Богатый наследник. Один. Пьян. Ты знаешь его отца. Он заплатит.', choices: [
+      { text: 'Похитить', effect: 'crm_kidnap_take' },
+      { text: 'Просто ограбить', effect: 'crm_kidnap_rob' },
+      { text: 'Уйти', effect: 'crm_kidnap_leave' }
+    ] },
+    { id: 'crm_art', title: 'Картина', desc: 'В частной коллекции есть картина, которая стоит целое состояние. Владелец в отъезде.', choices: [
+      { text: 'Украсть', effect: 'crm_art_steal' },
+      { text: 'Подменить', effect: 'crm_art_swap' },
+      { text: 'Уйти', effect: 'crm_art_leave' }
+    ] },
+    { id: 'crm_warehouse', title: 'Склад', desc: 'Ты знаешь, где хранится товар конкурентов. Там только один охранник. И собака.', choices: [
+      { text: 'Ограбить', effect: 'crm_warehouse_rob' },
+      { text: 'Сжечь', effect: 'crm_warehouse_burn' },
+      { text: 'Уйти', effect: 'crm_warehouse_leave' }
+    ] },
+    { id: 'crm_ransom', title: 'Обмен', desc: 'Ты должен обменять чемодан с деньгами на заложника. Место встречи — старый вокзал.', choices: [
+      { text: 'Обменять', effect: 'crm_ransom_exchange' },
+      { text: 'Подставить', effect: 'crm_ransom_double' },
+      { text: 'Напасть', effect: 'crm_ransom_attack' }
+    ] },
+    { id: 'crm_pit', title: 'Яма', desc: 'В подвале — яма, где дерутся люди. Ты можешь поставить или спуститься. На кону — большие деньги.', choices: [
+      { text: 'Поставить', effect: 'crm_pit_bet' },
+      { text: 'Спуститься', effect: 'crm_pit_fight' },
+      { text: 'Уйти', effect: 'crm_pit_leave' }
+    ] },
   ],
 
   // Эффекты (применяются в EventsSystem)
@@ -837,7 +1097,7 @@ const EventData = {
 
     paranoia_wall_erase: { sanity: -3, log: 'Ты стираешь надпись. Но она остаётся в твоей голове.', tone: 'warn' },
     paranoia_wall_search: { sanity: -10, heat: +5, log: 'Ты проверяешь квартиру. Находишь жучок. Кто-то слушал тебя. Долго.', tone: 'bad' },
-    paranoia_wall_move: { money: -500, sanity: -5, log: 'Ты переезжаешь. Новая квартира. Но надпись появляется снова. На новой стене.', tone: 'bad' }
+    paranoia_wall_move: { money: -500, sanity: -5, log: 'Ты переезжаешь. Новая квартира. Но надпись появляется снова. На новой стене.', tone: 'bad' },
     
     // ═══ БЛОК 2: ЭФФЕКТЫ ═══
     ill_fever_endure: { hp: -15, sanity: -5, log: 'Ты перетерпел. Жар ушёл. Слабость осталась.', tone: 'bad' },
@@ -1039,5 +1299,161 @@ const EventData = {
     city_fire_rescue: { hp: -20, rep: +10, sanity: +5, log: 'Ты спасаешь человека. Он плачет. Ты уходишь. Ты — герой?', tone: 'good' },
     city_fire_watch: { sanity: -3, log: 'Ты смотришь. Огонь. Крики. Люди. Ты не помогаешь.', tone: 'warn' },
     city_fire_leave: { sanity: -1, log: 'Ты уходишь. Пожар бушует. Не твоя проблема.', tone: 'info' },
+    
+    // ═══ БЛОК 3: ЭФФЕКТЫ ═══
+    war_convoy_attack: { hp: -20, money: 1200, heat: 15, sanity: -5, rep: 8, log: 'Ты нападаешь на конвой. Машины горят. Товар твой. Но кто-то выжил.', tone: 'bad' },
+    war_convoy_cops: { heat: -5, rep: -2, money: 200, log: 'Ты сообщаешь копам. Конвой перехвачен. Тебе дают награду. Но свои считают тебя стукачом.', tone: 'warn' },
+    war_convoy_ignore: { sanity: -2, log: 'Ты пропускаешь конвой. Война продолжается без тебя.', tone: 'info' },
+    war_sniper_flank: { hp: -10, rep: 5, heat: 5, log: 'Ты заходишь сзади. Снайпер мёртв. Твои люди в безопасности.', tone: 'good' },
+    war_sniper_fire: { money: -200, heat: 10, log: 'Ты вызываешь огонь. Крыша горит. Снайпер прыгает. Не выживает.', tone: 'warn' },
+    war_sniper_leave: { sanity: -5, rep: -3, log: 'Ты уходишь. Снайпер продолжает работать. Твои люди гибнут.', tone: 'bad' },
+    war_molotov_fire: { money: -300, hp: -15, log: 'Ты тушишь пожар. Бар спасён. Но выгорела половина.', tone: 'warn' },
+    war_molotov_run: { money: -500, sanity: -5, log: 'Ты бежишь. Бар сгорает. Пламя освещает улицу.', tone: 'bad' },
+    war_molotov_hunt: { hp: -10, rep: 5, heat: 5, log: 'Ты находишь нападавшего. Он говорит, кто заказал. Ты его отпускаешь.', tone: 'good' },
+    war_boss_kill: { heat: 25, sanity: -10, rep: 10, log: 'Ты убиваешь главу. Враг обезглавлен. Но его люди будут мстить.', tone: 'bad' },
+    war_boss_capture: { money: 2000, rep: 8, log: 'Ты захватываешь его. Он платит за жизнь. Две тысячи. Наличными.', tone: 'good' },
+    war_boss_follow: { sanity: -3, heat: 5, log: 'Ты следишь за ним. Он идёт в участок. Копы. Вот это поворот.', tone: 'warn' },
+    war_bomb_defuse: { sanity: -10, hp: -5, log: 'Ты обезвреживаешь бомбу. Провода, пот, дрожащие пальцы. Но ты жив.', tone: 'good' },
+    war_bomb_jump: { hp: -20, sanity: -5, log: 'Ты прыгаешь. Взрыв. Тебя отбрасывает. Но ты выживаешь.', tone: 'warn' },
+    war_bomb_drive: { hp: -10, money: -500, log: 'Ты отгоняешь машину. Взрыв вдалеке. Ты спас людей. Но потерял тачку.', tone: 'warn' },
+    war_truce_peace: { rep: 5, heat: -10, money: 500, log: 'Мир заключён. Война окончена. Пока. Ты получаешь процент.', tone: 'good' },
+    war_truce_provoke: { heat: 15, sanity: -10, rep: -5, log: 'Ты провоцируешь. Стрельба. Труп. Война начинается снова.', tone: 'bad' },
+    war_truce_kill: { heat: 30, sanity: -20, rep: -10, log: 'Ты убиваешь обоих. Стол переговоров в крови. Ты — враг для всех.', tone: 'bad' },
+    war_armored_explosive: { heat: 20, sanity: -10, money: 2000, log: 'Взрывчатка срабатывает. Броня вскрыта. Деньги твои. Но полиция уже едет.', tone: 'bad' },
+    war_armored_block: { hp: -15, money: 1000, log: 'Ты блокируешь машину. Инкассаторы не готовы. Ты забираешь деньги. Но один успевает выстрелить.', tone: 'warn' },
+    war_armored_ignore: { sanity: -1, log: 'Ты не связываешься. Слишком опасно. Пусть едут.', tone: 'info' },
+    war_hostage_ransom: { money: 3000, heat: 15, sanity: -5, log: 'Прокурор платит. Три тысячи. Ты отпускаешь сына. Он смотрит на тебя с ненавистью.', tone: 'warn' },
+    war_hostage_release: { rep: 5, heat: -5, log: 'Ты отпускаешь его. Прокурор запомнит. Может быть, это поможет.', tone: 'good' },
+    war_hostage_kill: { heat: 40, sanity: -20, rep: -10, log: 'Ты убиваешь его. Город замер. Прокурор объявляет войну. Тебе конец.', tone: 'bad' },
+    war_driveby_return: { hp: -15, heat: 15, sanity: -5, log: 'Ты стреляешь в ответ. Стекло разбито. Кто-то кричит. Машина уезжает. Ты ранен.', tone: 'warn' },
+    war_driveby_hide: { sanity: -5, log: 'Ты прячешься. Пули летят мимо. Ты жив. Но кто это был?', tone: 'info' },
+    war_driveby_plate: { sanity: -3, heat: 5, log: 'Ты запоминаешь номер. Это машина из другого района. Ты знаешь, чья она.', tone: 'warn' },
+    war_flame_save: { hp: -20, money: -300, log: 'Ты спасаешь товар. Огонь обжигает руки. Но ты вытаскиваешь половину.', tone: 'warn' },
+    war_flame_people: { rep: 8, sanity: 5, hp: -10, log: 'Ты спасаешь людей. Они выживают. Ты — герой. Но склад сгорел.', tone: 'good' },
+    war_flame_call: { money: -100, heat: -5, log: 'Ты звонишь в пожарную. Они приезжают. Огонь потушен. Но полиция начинает задавать вопросы.', tone: 'info' },
+
+    wpn_case_take: { money: 400, sanity: -2, log: 'Ты забираешь пистолет. Глушитель. Идеально.', tone: 'good' },
+    wpn_case_sell: { money: 600, log: 'Ты продаёшь его. Покупатель доволен. Ты тоже.', tone: 'good' },
+    wpn_case_leave: { sanity: -1, log: 'Ты оставляешь его. Кто-то другой найдёт.', tone: 'info' },
+    wpn_broken_fix: { money: -100, hp: 5, log: 'Ты чинишь его. Щелчок. Затвор работает. Теперь он снова стреляет.', tone: 'good' },
+    wpn_broken_throw: { money: -200, sanity: -3, log: 'Ты выбрасываешь его. Враги приближаются. У тебя нет оружия.', tone: 'bad' },
+    wpn_broken_throw_weapon: { hp: -10, sanity: -5, log: 'Ты бросаешь пистолет в врага. Попал. Он падает. Но у тебя больше нет оружия.', tone: 'warn' },
+    wpn_custom_buy: { money: -800, sanity: 3, log: 'Ты покупаешь кастомный ствол. Оружейник улыбается. Ты тоже. Он стреляет как мечта.', tone: 'good' },
+    wpn_custom_refuse: { sanity: -1, log: 'Ты отказываешься. Слишком дорого. Или слишком подозрительно.', tone: 'info' },
+    wpn_custom_take: { hp: -10, heat: 10, rep: 5, log: 'Ты забираешь его бесплатно. Оружейник не в восторге. Но ты уходишь с новым стволом.', tone: 'warn' },
+    wpn_cache_take: { money: 1000, heat: 10, log: 'Ты забираешь партию. Автоматы в масле. Идеальны. Но кто-то мог их найти.', tone: 'good' },
+    wpn_cache_sell: { money: 1500, heat: 15, log: 'Ты продаёшь автоматы. Покупатели довольны. Ты тоже.', tone: 'good' },
+    wpn_cache_leave: { sanity: -1, log: 'Ты оставляешь их. Слишком горячо.', tone: 'info' },
+    wpn_silencer_buy: { money: -200, sanity: 2, log: 'Ты покупаешь глушитель. Теперь стрельба будет тихой.', tone: 'good' },
+    wpn_silencer_check: { sanity: -3, heat: 3, log: 'Ты проверяешь его. Он работает. Но продавец оказался копом под прикрытием.', tone: 'bad' },
+    wpn_silencer_refuse: { sanity: 1, log: 'Ты отказываешься. Слишком подозрительно.', tone: 'info' },
+    wpn_cop_gun_take: { heat: 15, money: 100, log: 'Ты забираешь пистолет. Номер сдан. Ты теперь в списке. Но у тебя есть улика.', tone: 'bad' },
+    wpn_cop_gun_plant: { heat: -5, rep: 3, log: 'Ты подбрасываешь его в машину конкурента. Копы найдут. Тебе не поверят.', tone: 'good' },
+    wpn_cop_gun_throw: { sanity: 1, log: 'Ты выбрасываешь его в реку. Металл тонет. Проблема решена.', tone: 'info' },
+    wpn_explosives_keep: { money: 200, heat: 5, log: 'Ты оставляешь взрывчатку. На чёрный день.', tone: 'warn' },
+    wpn_explosives_sell: { money: 600, heat: 10, log: 'Ты продаёшь её. Покупатель улыбается. Это ненадолго.', tone: 'good' },
+    wpn_explosives_destroy: { sanity: 2, log: 'Ты уничтожаешь её. Взрыв в карьере. Ты спокоен.', tone: 'info' },
+    wpn_blackmarket_buy: { money: -1500, sanity: -5, log: 'Ты покупаешь винтовку. Дорого. Но она стоит того.', tone: 'good' },
+    wpn_blackmarket_bargain: { money: -1000, sanity: -2, log: 'Ты торгуешься. Продавец недоволен. Но сделка закрыта.', tone: 'good' },
+    wpn_blackmarket_rob: { money: 500, heat: 20, sanity: -10, log: 'Ты грабишь его. Забираешь деньги и винтовку. Но он запомнил твоё лицо.', tone: 'bad' },
+    wpn_ammo_buy: { money: -300, sanity: 2, log: 'Ты покупаешь патроны. Они пробивают бронежилеты. Ты готов.', tone: 'good' },
+    wpn_ammo_ask: { sanity: -3, heat: 5, log: 'Ты спрашиваешь. Он говорит, что патроны из полиции. Теперь ты знаешь.', tone: 'warn' },
+    wpn_ammo_refuse: { sanity: 1, log: 'Ты отказываешься. Слишком опасно.', tone: 'info' },
+    wpn_jam_fix: { hp: -10, sanity: -5, log: 'Ты чинишь его. Враги приближаются. Ты успеваешь выстрелить.', tone: 'warn' },
+    wpn_jam_fight: { hp: -20, sanity: -5, log: 'Ты бьёшь кулаком. Он падает. Второй бежит. Ты жив.', tone: 'warn' },
+    wpn_jam_run: { hp: -5, sanity: -3, log: 'Ты бежишь. Враги не преследуют. Ты спасся.', tone: 'info' },
+
+    car_stolen_steal: { money: 500, heat: 10, log: 'Ты угоняешь. Машина ревёт. Ты уезжаешь. Но кто-то видел.', tone: 'bad' },
+    car_stolen_wait: { sanity: -1, log: 'Ты ждёшь. Владелец приходит. Ты уходишь. Скучно.', tone: 'info' },
+    car_stolen_check: { sanity: -2, heat: 3, log: 'Ты проверяешь. Внутри — сумка с документами. Ты знаешь, чей это Кадиллак.', tone: 'warn' },
+    car_race_race: { money: 500, sanity: 5, log: 'Ты гонишь. Побеждаешь. Он платит. Ты уезжаешь с деньгами и адреналином.', tone: 'good' },
+    car_race_ignore: { sanity: 1, log: 'Ты не гоняешь. Он уезжает. Скучно.', tone: 'info' },
+    car_race_shoot: { heat: 20, sanity: -10, log: 'Ты стреляешь. Он врезается. Ты уезжаешь. Но это уже не гонка.', tone: 'bad' },
+    car_bomb_exit: { sanity: -5, hp: -10, log: 'Ты выпрыгиваешь. Взрыв. Тебя отбрасывает. Но ты жив.', tone: 'warn' },
+    car_bomb_drive: { money: -500, sanity: -10, log: 'Ты гонишь. Взрыв. Машина уничтожена. Но ты успел выпрыгнуть.', tone: 'bad' },
+    car_bomb_search: { sanity: -10, heat: 5, log: 'Ты ищешь. Находишь бомбу. Обезвреживаешь. Но кто её поставил?', tone: 'warn' },
+    car_tire_fix: { hp: -5, money: -50, log: 'Ты меняешь колесо. В темноте. Долго. Но справляешься.', tone: 'warn' },
+    car_tire_walk: { sanity: -3, log: 'Ты идёшь пешком. Долго. Холодно. Но доходишь.', tone: 'info' },
+    car_tire_wait: { sanity: -5, hp: -5, log: 'Ты ждёшь. Проходит час. Никто не приезжает. Ты замерзаешь.', tone: 'bad' },
+    car_custom_buy: { money: -3000, sanity: 3, log: 'Ты покупаешь её. Она блестит. Ты уезжаешь. Все смотрят.', tone: 'good' },
+    car_custom_steal: { heat: 20, sanity: -5, log: 'Ты угоняешь её. Владелец увидит. Он не забудет.', tone: 'bad' },
+    car_custom_refuse: { sanity: 1, log: 'Ты отказываешься. Слишком дорого.', tone: 'info' },
+    car_chopshop_burn: { heat: 25, sanity: -10, log: 'Ты сжигаешь её. Огонь виден издалека. Полиция приедет. Но ты уходишь.', tone: 'bad' },
+    car_chopshop_deal: { money: 500, heat: -5, log: 'Ты договариваешься. Они платят. Ты уходишь. Все довольны.', tone: 'good' },
+    car_chopshop_rob: { money: 1000, heat: 15, sanity: -5, log: 'Ты грабишь их. Забираешь всё. Но они запомнят.', tone: 'warn' },
+    car_chase_escape: { hp: -10, heat: 15, log: 'Ты уходишь. Мигалки исчезают в зеркалах. Ты выдыхаешь.', tone: 'warn' },
+    car_chase_stop: { heat: -5, money: -200, log: 'Ты останавливаешься. Копы проверяют. Ты платишь штраф. Они уезжают.', tone: 'info' },
+    car_chase_shoot: { heat: 40, sanity: -15, log: 'Ты стреляешь. Копы отвечают. Ты уходишь. Но теперь ты в списке.', tone: 'bad' },
+    car_crash_apologize: { sanity: -2, log: 'Ты извиняешься. Они смотрят на тебя. Уходят. Ты выдыхаешь.', tone: 'info' },
+    car_crash_pay: { money: -300, log: 'Ты платишь. Они довольны. Ты уезжаешь.', tone: 'good' },
+    car_crash_fight: { hp: -15, heat: 10, sanity: -5, log: 'Ты дерёшься. Они падают. Ты уезжаешь. Но у тебя разбита губа.', tone: 'warn' },
+    car_engine_fix: { money: -200, hp: -5, log: 'Ты чинишь его. Долго. Грязно. Но машина заводится.', tone: 'warn' },
+    car_engine_abandon: { money: -500, sanity: -3, log: 'Ты бросаешь её. Идёшь пешком. Долго.', tone: 'bad' },
+    car_engine_steal: { heat: 15, money: 100, log: 'Ты угоняешь другую. Быстро. Ты уезжаешь. Но кто-то видел.', tone: 'warn' },
+    car_jack_escape: { hp: -10, sanity: -5, log: 'Ты даёшь по газам. Он стреляет. Пуля пробивает стекло. Но ты уезжаешь.', tone: 'warn' },
+    car_jack_give: { money: -1000, sanity: -3, log: 'Ты отдаёшь ключи. Он уезжает. Ты остаёшься на улице. Пешком.', tone: 'bad' },
+    car_jack_fight: { hp: -20, sanity: -5, rep: 3, log: 'Ты дерёшься. Он падает. Ты забираешь его пистолет. Уезжаешь.', tone: 'good' },
+
+    pkr_highstakes_play: { money: 500, sanity: -5, log: 'Ты играешь. Блефуешь. Побеждаешь. Или проигрываешь. Сегодня — победа.', tone: 'good' },
+    pkr_highstakes_watch: { sanity: 2, log: 'Ты наблюдаешь. Изучаешь игроков. Это тоже опыт.', tone: 'info' },
+    pkr_highstakes_leave: { sanity: 1, log: 'Ты уходишь. Слишком высокие ставки.', tone: 'info' },
+    pkr_dice_expose: { heat: 10, rep: 3, log: 'Ты срываешь игру. Они недовольны. Но ты забираешь банк.', tone: 'warn' },
+    pkr_dice_join: { money: -200, sanity: -3, log: 'Ты играешь. Кости не твои. Ты проигрываешь.', tone: 'bad' },
+    pkr_dice_leave: { sanity: 1, log: 'Ты проходишь мимо. Игра продолжается.', tone: 'info' },
+    pkr_heist_rob: { money: 2000, heat: 25, sanity: -10, log: 'Ты грабишь казино. Охрана не готова. Ты уходишь с деньгами.', tone: 'bad' },
+    pkr_heist_play: { money: -500, sanity: -3, log: 'Ты играешь. Ставки высокие. Ты проигрываешь. Но получаешь удовольствие.', tone: 'warn' },
+    pkr_heist_cops: { heat: -5, rep: -3, money: 300, log: 'Ты сдаёшь казино копам. Они благодарят. Бандиты ищут стукача.', tone: 'warn' },
+    pkr_shark_take: { money: 1000, heat: 5, sanity: -5, log: 'Ты берёшь деньги. Под проценты. Ты знаешь, что будешь должен.', tone: 'warn' },
+    pkr_shark_refuse: { sanity: 1, log: 'Ты отказываешься. Акула улыбается. Уходит.', tone: 'info' },
+    pkr_shark_rob: { money: 1500, heat: 15, sanity: -5, log: 'Ты грабишь ростовщика. Он в ярости. Ты уходишь.', tone: 'bad' },
+    pkr_marked_tell: { rep: 3, heat: 5, log: 'Ты говоришь всем. Игра останавливается. Жулика вышвыривают.', tone: 'good' },
+    pkr_marked_use: { money: 800, sanity: -5, log: 'Ты используешь меченые карты. Выигрываешь. Но кто-то видел.', tone: 'warn' },
+    pkr_marked_leave: { sanity: 1, log: 'Ты уходишь. Игра продолжается без тебя.', tone: 'info' },
+    pkr_streak_continue: { money: -500, sanity: -5, log: 'Ты играешь. Проигрываешь. Ещё раз. Ещё. Ты не можешь остановиться.', tone: 'bad' },
+    pkr_streak_stop: { sanity: 3, log: 'Ты останавливаешься. Умное решение. Редкое.', tone: 'good' },
+    pkr_streak_loan: { money: -1000, sanity: -8, log: 'Ты берёшь кредит. Играешь. Проигрываешь. Теперь ты должен больше.', tone: 'bad' },
+    pkr_win_take: { money: 2000, sanity: 5, log: 'Ты забираешь деньги. Все смотрят. Ты уходишь.', tone: 'good' },
+    pkr_win_tip: { money: 1800, rep: 3, log: 'Ты оставляешь чаевые. Официант улыбается. Ты уходишь.', tone: 'good' },
+    pkr_win_allin: { money: 0, sanity: -10, log: 'Ты ставишь всё. Проигрываешь. Всё. Ты выходишь на улицу пустым.', tone: 'bad' },
+    pkr_cheat_expose: { rep: 5, heat: 5, log: 'Ты сдаёшь жулика. Его вышвыривают. Ты — герой.', tone: 'good' },
+    pkr_cheat_blackmail: { money: 500, heat: 5, sanity: -3, log: 'Ты шантажируешь его. Он платит. Ты уходишь. Он запомнил.', tone: 'warn' },
+    pkr_cheat_ignore: { sanity: 1, log: 'Ты не замечаешь. Игра продолжается.', tone: 'info' },
+    pkr_fight_bet: { money: -300, sanity: -3, log: 'Ты ставишь. Боец проигрывает. Ты теряешь деньги.', tone: 'bad' },
+    pkr_fight_fight: { hp: -20, money: 500, rep: 3, log: 'Ты выходишь на ринг. Побеждаешь. Забираешь деньги. Но у тебя разбит нос.', tone: 'warn' },
+    pkr_fight_leave: { sanity: 1, log: 'Ты уходишь. Бои продолжаются.', tone: 'info' },
+    pkr_roulette_play: { sanity: -15, hp: -10, log: 'Ты играешь. Пуля проходит мимо. Ты выживаешь. Но ты никогда не будешь прежним.', tone: 'bad' },
+    pkr_roulette_shoot: { heat: 30, sanity: -10, rep: 5, log: 'Ты стреляешь в ведущего. Паника. Ты уходишь. Игра окончена.', tone: 'bad' },
+    pkr_roulette_leave: { sanity: 3, log: 'Ты уходишь. Ты умнее остальных.', tone: 'good' },
+
+    crm_bank_rob: { money: 3000, heat: 30, sanity: -15, log: 'Ты грабишь банк. Охрана не готова. Ты уходишь с деньгами. Но это не конец.', tone: 'bad' },
+    crm_bank_tip: { money: 500, rep: -2, log: 'Ты продаёшь наводку. Банда грабит. Ты получаешь процент.', tone: 'warn' },
+    crm_bank_leave: { sanity: 1, log: 'Ты проходишь мимо. Ограбление не для тебя.', tone: 'info' },
+    crm_jewelry_rob: { money: 1500, heat: 20, sanity: -10, log: 'Ты грабишь ювелирный. Старик даже не сопротивляется. Ты уходишь с золотом.', tone: 'bad' },
+    crm_jewelry_buy: { money: -500, sanity: 3, log: 'Ты покупаешь украшение. Для одной из женщин. Она будет довольна.', tone: 'good' },
+    crm_jewelry_leave: { sanity: 1, log: 'Ты проходишь мимо. Витрина остаётся.', tone: 'info' },
+    crm_blackmail_use: { money: 2000, heat: 5, sanity: -3, log: 'Ты шантажируешь политика. Он платит. Много. Ты уходишь.', tone: 'warn' },
+    crm_blackmail_sell: { money: 3000, heat: 10, rep: -5, log: 'Ты продаёшь компромат. Покупатель — конкурент. Политик уничтожен.', tone: 'bad' },
+    crm_blackmail_burn: { sanity: 5, rep: 3, log: 'Ты сжигаешь компромат. Кто-то вздыхает с облегчением. Может быть, это ты.', tone: 'good' },
+    crm_extortion_demand: { money: 400, heat: 5, rep: 3, log: 'Ты требуешь. Он платит. Он боится. Это правильно.', tone: 'good' },
+    crm_extortion_protect: { money: 200, rep: 5, log: 'Ты предлагаешь защиту. Он соглашается. Теперь ты — его крыша.', tone: 'good' },
+    crm_extortion_leave: { sanity: 1, log: 'Ты уходишь. Бар остаётся без крыши.', tone: 'info' },
+    crm_smuggle_transport: { money: 1500, heat: 15, sanity: -5, log: 'Ты везёшь ящик. Через границу. Без проблем. Деньги твои.', tone: 'good' },
+    crm_smuggle_check: { sanity: -5, heat: 5, log: 'Ты открываешь ящик. Внутри — оружие. Много. Ты везешь его. Деньги твои.', tone: 'warn' },
+    crm_smuggle_refuse: { sanity: 1, log: 'Ты отказываешься. Кто-то другой повезёт.', tone: 'info' },
+    crm_kidnap_take: { money: 3000, heat: 25, sanity: -15, log: 'Ты похищаешь его. Отец платит. Три тысячи. Ты отпускаешь. Он не забудет твоё лицо.', tone: 'bad' },
+    crm_kidnap_rob: { money: 500, heat: 10, sanity: -5, log: 'Ты просто грабишь его. Он пьян. Не сопротивляется. Ты уходишь.', tone: 'warn' },
+    crm_kidnap_leave: { sanity: 1, log: 'Ты уходишь. Он остаётся в баре.', tone: 'info' },
+    crm_art_steal: { money: 2500, heat: 20, sanity: -5, log: 'Ты крадёшь картину. Она твоя. Теперь нужно найти покупателя.', tone: 'good' },
+    crm_art_swap: { money: 1000, heat: 10, sanity: -3, log: 'Ты подменяешь картину. Никто не замечает. Ты уходишь с оригиналом.', tone: 'good' },
+    crm_art_leave: { sanity: 1, log: 'Ты уходишь. Картина остаётся.', tone: 'info' },
+    crm_warehouse_rob: { money: 1800, heat: 20, sanity: -10, hp: -15, log: 'Ты грабишь склад. Охранник сопротивляется. Ты его вырубаешь. Собака кусает. Но ты уходишь с товаром.', tone: 'bad' },
+    crm_warehouse_burn: { heat: 25, sanity: -15, log: 'Ты сжигаешь склад. Огонь виден издалека. Товар конкурентов уничтожен.', tone: 'bad' },
+    crm_warehouse_leave: { sanity: 1, log: 'Ты уходишь. Склад остаётся.', tone: 'info' },
+    crm_ransom_exchange: { money: 2000, heat: 10, sanity: -5, log: 'Ты обмениваешь. Заложник свободен. Деньги твои. Всё чисто.', tone: 'good' },
+    crm_ransom_double: { money: 4000, heat: 20, sanity: -10, rep: -5, log: 'Ты подставляешь. Забираешь деньги и заложника. Все в ярости.', tone: 'bad' },
+    crm_ransom_attack: { hp: -20, money: 1000, heat: 25, sanity: -10, log: 'Ты нападаешь. Стрельба. Ты уходишь с деньгами. Но заложник мёртв.', tone: 'bad' },
+    crm_pit_bet: { money: -300, sanity: -3, log: 'Ты ставишь. Боец проигрывает. Деньги уходят.', tone: 'bad' },
+    crm_pit_fight: { hp: -25, money: 800, rep: 5, log: 'Ты спускаешься в яму. Дерёшься. Побеждаешь. Забираешь деньги. Но ты весь в крови.', tone: 'warn' },
+    crm_pit_leave: { sanity: 1, log: 'Ты уходишь. Яма остаётся.', tone: 'info' },
   },
 };
