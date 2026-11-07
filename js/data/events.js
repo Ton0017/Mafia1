@@ -855,6 +855,261 @@ const EventData = {
       { text: 'Спуститься', effect: 'crm_pit_fight' },
       { text: 'Уйти', effect: 'crm_pit_leave' }
     ] },
+    // ═══ БЛОК 4: МИСТИКА ═══
+    { id: 'mys_dream', title: 'Странный сон', desc: 'Ты видишь себя в гробу. Рядом стоят люди в чёрном. Ты не можешь пошевелиться. Потом просыпаешься в холодном поту.', choices: [
+      { text: 'Записать', effect: 'mys_dream_write' },
+      { text: 'Забыть', effect: 'mys_dream_forget' },
+      { text: 'Рассказать кому-то', effect: 'mys_dream_tell' }
+    ] },
+    { id: 'mys_ghost', title: 'Призрак на дороге', desc: 'Ночью на пустой дороге ты видишь женщину в белом. Она стоит на обочине. Не двигается. Когда ты проезжаешь мимо — её уже нет.', choices: [
+      { text: 'Вернуться', effect: 'mys_ghost_return' },
+      { text: 'Гнать дальше', effect: 'mys_ghost_drive' },
+      { text: 'Перекреститься', effect: 'mys_ghost_pray' }
+    ] },
+    { id: 'mys_premonition', title: 'Предчувствие', desc: 'Ты чувствуешь, что сегодня что-то случится. Не знаешь что. Но чувство сильное. Ты не можешь его отогнать.', choices: [
+      { text: 'Остаться дома', effect: 'mys_premonition_home' },
+      { text: 'Выйти как обычно', effect: 'mys_premonition_normal' },
+      { text: 'Купить оружие', effect: 'mys_premonition_weapon' }
+    ] },
+    { id: 'mys_coincidence', title: 'Слишком много совпадений', desc: 'Три раза за день ты встречаешь одного человека. В разных местах. Он смотрит на тебя. Каждый раз.', choices: [
+      { text: 'Подойти', effect: 'mys_coincidence_approach' },
+      { text: 'Следить', effect: 'mys_coincidence_follow' },
+      { text: 'Игнорировать', effect: 'mys_coincidence_ignore' }
+    ] },
+    { id: 'mys_mirror_voice', title: 'Голос из зеркала', desc: 'Ты смотришь в зеркало. Отражение шевелит губами. Ты слышишь своё имя. Но губы твои сжаты.', choices: [
+      { text: 'Прислушаться', effect: 'mys_mirror_voice_listen' },
+      { text: 'Разбить', effect: 'mys_mirror_voice_break' },
+      { text: 'Отвернуться', effect: 'mys_mirror_voice_turn' }
+    ] },
+    { id: 'mys_phone', title: 'Звонок с того света', desc: 'Телефон звонит. На экране — имя человека, который умер месяц назад. Ты берёшь трубку. Тишина. Потом — шёпот.', choices: [
+      { text: 'Слушать', effect: 'mys_phone_listen' },
+      { text: 'Сбросить', effect: 'mys_phone_hangup' },
+      { text: 'Перезвонить', effect: 'mys_phone_callback' }
+    ] },
+    { id: 'mys_blood', title: 'Кровавые следы', desc: 'На полу — кровавые следы. Они ведут в комнату, которую ты запер. Ты не помнишь, чтобы входил туда.', choices: [
+      { text: 'Открыть комнату', effect: 'mys_blood_open' },
+      { text: 'Закрыть дверь', effect: 'mys_blood_close' },
+      { text: 'Вызвать копов', effect: 'mys_blood_cops' }
+    ] },
+    { id: 'mys_double', title: 'Двойник', desc: 'Кто-то с твоим лицом входит в бар через чёрный ход. Бармен смотрит на тебя, потом на дверь. На его лице — ужас.', choices: [
+      { text: 'Выйти навстречу', effect: 'mys_double_meet' },
+      { text: 'Спросить бармена', effect: 'mys_double_ask' },
+      { text: 'Уйти через главный', effect: 'mys_double_leave' }
+    ] },
+    { id: 'mys_music', title: 'Музыка в пустом доме', desc: 'Из заброшенного дома играет музыка. Фортепиано. Кто-то играет в доме, где двадцать лет никто не жил.', choices: [
+      { text: 'Войти', effect: 'mys_music_enter' },
+      { text: 'Слушать снаружи', effect: 'mys_music_listen' },
+      { text: 'Уйти', effect: 'mys_music_leave' }
+    ] },
+
+    // ═══ БЛОК 4: СМЕРТЬ ═══
+    { id: 'dth_funeral', title: 'Похороны старого друга', desc: 'Хоронят человека, с которым ты работал пять лет. На похоронах — мало людей. Это грустно. И это реальность.', choices: [
+      { text: 'Подойти к гробу', effect: 'dth_funeral_approach' },
+      { text: 'Дать денег семье', effect: 'dth_funeral_give' },
+      { text: 'Уйти тихо', effect: 'dth_funeral_leave' }
+    ] },
+    { id: 'dth_dying', title: 'Умирающий', desc: 'На улице лежит человек. Ему осталось несколько минут. Он хочет что-то сказать. Ты не знаешь его.', choices: [
+      { text: 'Выслушать', effect: 'dth_dying_listen' },
+      { text: 'Вызвать скорую', effect: 'dth_dying_call' },
+      { text: 'Пройти мимо', effect: 'dth_dying_leave' }
+    ] },
+    { id: 'dth_inheritance', title: 'Наследство', desc: 'Умер дальний родственник. Ты — единственный наследник. В доме — вещи, бумаги, тайны. И долги.', choices: [
+      { text: 'Вступить в наследство', effect: 'dth_inheritance_take' },
+      { text: 'Отказаться', effect: 'dth_inheritance_refuse' },
+      { text: 'Продать дом', effect: 'dth_inheritance_sell' }
+    ] },
+    { id: 'dth_memory', title: 'Воспоминание', desc: 'Ты проходишь мимо места, где погиб твой друг. Вспоминаешь его лицо. Ты не помнишь его имени.', choices: [
+      { text: 'Постоять', effect: 'dth_memory_stand' },
+      { text: 'Помолиться', effect: 'dth_memory_pray' },
+      { text: 'Пройти мимо', effect: 'dth_memory_leave' }
+    ] },
+    { id: 'dth_grave', title: 'Старая могила', desc: 'На кладбище ты находишь могилу с твоим именем. И датой смерти. Дата — через три дня.', choices: [
+      { text: 'Убрать надгробие', effect: 'dth_grave_remove' },
+      { text: 'Спросить смотрителя', effect: 'dth_grave_ask' },
+      { text: 'Уйти', effect: 'dth_grave_leave' }
+    ] },
+    { id: 'dth_lastword', title: 'Последняя воля', desc: 'Умирающий старик просит выполнить его последнюю волю. Отдать письмо человеку, которого он убил много лет назад.', choices: [
+      { text: 'Выполнить', effect: 'dth_lastword_do' },
+      { text: 'Отказаться', effect: 'dth_lastword_refuse' },
+      { text: 'Сжечь письмо', effect: 'dth_lastword_burn' }
+    ] },
+    { id: 'dth_will', title: 'Завещание', desc: 'На столе — завещание. Ты видишь в нём своё имя. И имя человека, который не должен наследовать.', choices: [
+      { text: 'Подделать', effect: 'dth_will_forge' },
+      { text: 'Оставить', effect: 'dth_will_keep' },
+      { text: 'Уничтожить', effect: 'dth_will_destroy' }
+    ] },
+    { id: 'dth_graveyard_shift', title: 'Ночная смена', desc: 'Сторож кладбища просит подменить его. Ночью. На кладбище. Он платит хорошо.', choices: [
+      { text: 'Согласиться', effect: 'dth_graveyard_shift_accept' },
+      { text: 'Отказаться', effect: 'dth_graveyard_shift_refuse' },
+      { text: 'Спросить зачем', effect: 'dth_graveyard_shift_ask' }
+    ] },
+    { id: 'dth_photograph', title: 'Фотография на память', desc: 'В старом альбоме — твоё фото с людьми, которых ты не знаешь. На обороте подписано: "Те, кто не выжил".', choices: [
+      { text: 'Найти их', effect: 'dth_photograph_find' },
+      { text: 'Сжечь альбом', effect: 'dth_photograph_burn' },
+      { text: 'Оставить', effect: 'dth_photograph_keep' }
+    ] },
+    { id: 'dth_ghost_town', title: 'Город-призрак', desc: 'Ты заходишь в район, где давно никто не живёт. Но в окнах горят огни. И тени двигаются внутри.', choices: [
+      { text: 'Войти', effect: 'dth_ghost_town_enter' },
+      { text: 'Смотреть', effect: 'dth_ghost_town_watch' },
+      { text: 'Уйти', effect: 'dth_ghost_town_leave' }
+    ] },
+
+    // ═══ БЛОК 4: МОРАЛЬНЫЙ ВЫБОР ═══
+    { id: 'mor_child', title: 'Ребёнок на улице', desc: 'Мальчик лет восьми. Голодный. Один. На улице дождь. Он просит денег. Ты можешь помочь.', choices: [
+      { text: 'Дать денег', effect: 'mor_child_give' },
+      { text: 'Купить еды', effect: 'mor_child_food' },
+      { text: 'Пройти мимо', effect: 'mor_child_leave' }
+    ] },
+    { id: 'mor_dying_enemy', title: 'Враг при смерти', desc: 'Твой враг ранен. Он умирает. Он смотрит на тебя. Он ждёт, что ты сделаешь.', choices: [
+      { text: 'Добить', effect: 'mor_dying_enemy_kill' },
+      { text: 'Вызвать врача', effect: 'mor_dying_enemy_help' },
+      { text: 'Уйти', effect: 'mor_dying_enemy_leave' }
+    ] },
+    { id: 'mor_stolen_goods', title: 'Украденные лекарства', desc: 'Твой человек украл партию лекарств. Они нужны в больнице. Он сделал это для тебя. Ты можешь вернуть.', choices: [
+      { text: 'Вернуть', effect: 'mor_stolen_goods_return' },
+      { text: 'Оставить', effect: 'mor_stolen_goods_keep' },
+      { text: 'Продать', effect: 'mor_stolen_goods_sell' }
+    ] },
+    { id: 'mor_witness', title: 'Свидетель', desc: 'Ребёнок видел, как ты убивал. Он стоит и смотрит. Он не плачет. Он запомнит.', choices: [
+      { text: 'Заплатить', effect: 'mor_witness_pay' },
+      { text: 'Отпустить', effect: 'mor_witness_release' },
+      { text: 'Убить', effect: 'mor_witness_kill' }
+    ] },
+    { id: 'mor_prostitute', title: 'Женщина в беде', desc: 'Женщина убегает от сутенёра. Она просит защиты. У неё кровь на лице. Ты можешь помочь.', choices: [
+      { text: 'Защитить', effect: 'mor_prostitute_protect' },
+      { text: 'Прогнать её', effect: 'mor_prostitute_leave' },
+      { text: 'Сдать сутенёру', effect: 'mor_prostitute_betray' }
+    ] },
+    { id: 'mor_traitor', title: 'Предатель', desc: 'Твой друг предал тебя. Он стоит перед тобой. Он знает, что заслужил смерть.', choices: [
+      { text: 'Убить', effect: 'mor_traitor_kill' },
+      { text: 'Простить', effect: 'mor_traitor_forgive' },
+      { text: 'Изгнать', effect: 'mor_traitor_exile' }
+    ] },
+    { id: 'mor_drugs', title: 'Наркоман', desc: 'Наркоман на улице. Он просит денег. Он не ест третий день. Но если ты дашь — он купит дозу.', choices: [
+      { text: 'Дать денег', effect: 'mor_drugs_give' },
+      { text: 'Купить еды', effect: 'mor_drugs_food' },
+      { text: 'Пройти мимо', effect: 'mor_drugs_leave' }
+    ] },
+    { id: 'mor_orphanage', title: 'Приют', desc: 'Директор приюта просит денег. Дети голодают. Он честный. Ты это видишь.', choices: [
+      { text: 'Пожертвовать', effect: 'mor_orphanage_donate' },
+      { text: 'Отказать', effect: 'mor_orphanage_refuse' },
+      { text: 'Проверить', effect: 'mor_orphanage_check' }
+    ] },
+    { id: 'mor_lottery', title: 'Лотерейный билет', desc: 'Ты находишь лотерейный билет. Он выигрышный. Большая сумма. Владелец — старуха из соседнего дома.', choices: [
+      { text: 'Вернуть', effect: 'mor_lottery_return' },
+      { text: 'Оставить себе', effect: 'mor_lottery_keep' },
+      { text: 'Поделить', effect: 'mor_lottery_share' }
+    ] },
+    { id: 'mor_beggar', title: 'Нищий с ребёнком', desc: 'Женщина с ребёнком на руках. Она не просит. Она просто стоит и смотрит. Ребёнок плачет.', choices: [
+      { text: 'Дать всё', effect: 'mor_beggar_all' },
+      { text: 'Дать немного', effect: 'mor_beggar_some' },
+      { text: 'Пройти мимо', effect: 'mor_beggar_leave' }
+    ] },
+
+    // ═══ БЛОК 4: СЛУЧАЙНОСТИ ═══
+    { id: 'rnd_brick', title: 'Кирпич с крыши', desc: 'Кирпич падает с крыши и разбивается у твоих ног. Ещё сантиметр — и он был бы в голове.', choices: [
+      { text: 'Посмотреть наверх', effect: 'rnd_brick_up' },
+      { text: 'Уйти быстрее', effect: 'rnd_brick_leave' },
+      { text: 'Забрать кирпич', effect: 'rnd_brick_take' }
+    ] },
+    { id: 'rnd_lottery', title: 'Лотерейный билет', desc: 'В кармане пальто ты находишь лотерейный билет. Ты не помнишь, когда его купил. Тираж сегодня.', choices: [
+      { text: 'Проверить', effect: 'rnd_lottery_check' },
+      { text: 'Выбросить', effect: 'rnd_lottery_throw' },
+      { text: 'Продать', effect: 'rnd_lottery_sell' }
+    ] },
+    { id: 'rnd_oldfriend', title: 'Старый друг', desc: 'На улице ты встречаешь человека из прошлого. Он был твоим другом. Он хочет поговорить.', choices: [
+      { text: 'Поговорить', effect: 'rnd_oldfriend_talk' },
+      { text: 'Уйти', effect: 'rnd_oldfriend_leave' },
+      { text: 'Напиться вместе', effect: 'rnd_oldfriend_drink' }
+    ] },
+    { id: 'rnd_lost_thing', title: 'Потерянная вещь', desc: 'Ты потерял что-то важное. Не помнишь что. Но чувствуешь, что это было с тобой очень давно.', choices: [
+      { text: 'Искать', effect: 'rnd_lost_thing_search' },
+      { text: 'Забыть', effect: 'rnd_lost_thing_forget' },
+      { text: 'Купить замену', effect: 'rnd_lost_thing_buy' }
+    ] },
+    { id: 'rnd_wallet', title: 'Бумажник', desc: 'На тротуаре лежит бумажник. Внутри — деньги, права, фото ребёнка. Хозяин где-то рядом.', choices: [
+      { text: 'Вернуть', effect: 'rnd_wallet_return' },
+      { text: 'Забрать деньги', effect: 'rnd_wallet_take' },
+      { text: 'Не трогать', effect: 'rnd_wallet_leave' }
+    ] },
+    { id: 'rnd_stranger', title: 'Странный незнакомец', desc: 'Человек в чёрном подходит к тебе. Не говорит. Просто кладёт в руку ключ. И уходит.', choices: [
+      { text: 'Проследить', effect: 'rnd_stranger_follow' },
+      { text: 'Найти замок', effect: 'rnd_stranger_find' },
+      { text: 'Выбросить ключ', effect: 'rnd_stranger_throw' }
+    ] },
+    { id: 'rnd_fire', title: 'Пожар в соседнем доме', desc: 'Соседний дом горит. Огонь быстро распространяется. Твоя квартира тоже в опасности.', choices: [
+      { text: 'Тушить', effect: 'rnd_fire_fire' },
+      { text: 'Спасать вещи', effect: 'rnd_fire_save' },
+      { text: 'Бежать', effect: 'rnd_fire_run' }
+    ] },
+    { id: 'rnd_umbrella', title: 'Зонт на скамейке', desc: 'На скамейке лежит зонт. Хороший. Дорогой. Никто не сидит рядом. Дождь идёт.', choices: [
+      { text: 'Забрать', effect: 'rnd_umbrella_take' },
+      { text: 'Оставить', effect: 'rnd_umbrella_leave' },
+      { text: 'Подождать хозяина', effect: 'rnd_umbrella_wait' }
+    ] },
+    { id: 'rnd_wind_money', title: 'Деньги на ветру', desc: 'Ветер вырывает пачку денег из чьих-то рук. Купюры летят по улице. Люди бросаются собирать.', choices: [
+      { text: 'Ловить', effect: 'rnd_wind_money_catch' },
+      { text: 'Помочь хозяину', effect: 'rnd_wind_money_help' },
+      { text: 'Наблюдать', effect: 'rnd_wind_money_watch' }
+    ] },
+    { id: 'rnd_photograph', title: 'Фотография на асфальте', desc: 'Кто-то уронил фотографию. На ней — трое. Все счастливы. Один из них — ты. Только ты не помнишь этот день.', choices: [
+      { text: 'Забрать', effect: 'rnd_photograph_take' },
+      { text: 'Искать хозяина', effect: 'rnd_photograph_find' },
+      { text: 'Оставить', effect: 'rnd_photograph_leave' }
+    ] },
+
+    // ═══ БЛОК 4: ФИНАЛ ═══
+    { id: 'fin_lastchance', title: 'Последний шанс', desc: 'У тебя есть шанс вырваться из этого города. Билет на поезд. Новое имя. Деньги на первое время. Но если ты уедешь — ты не вернёшься.', choices: [
+      { text: 'Уехать', effect: 'fin_lastchance_go' },
+      { text: 'Остаться', effect: 'fin_lastchance_stay' },
+      { text: 'Сжечь билет', effect: 'fin_lastchance_burn' }
+    ] },
+    { id: 'fin_reckoning', title: 'Расплата', desc: 'Человек, которого ты когда-то предал, вернулся. Он ждал много лет. Он готов.', choices: [
+      { text: 'Драться', effect: 'fin_reckoning_fight' },
+      { text: 'Заплатить', effect: 'fin_reckoning_pay' },
+      { text: 'Просить прощения', effect: 'fin_reckoning_beg' }
+    ] },
+    { id: 'fin_redemption', title: 'Искупление', desc: 'Ты можешь спасти одного человека. Ценой всего, что у тебя есть. Ценой жизни. Ценой свободы.', choices: [
+      { text: 'Спасти', effect: 'fin_redemption_save' },
+      { text: 'Отказаться', effect: 'fin_redemption_refuse' },
+      { text: 'Найти компромисс', effect: 'fin_redemption_compromise' }
+    ] },
+    { id: 'fin_point_of_no_return', title: 'Точка невозврата', desc: 'Ты стоишь перед дверью. За ней — всё, что ты хотел. Обратно пути не будет.', choices: [
+      { text: 'Открыть', effect: 'fin_door_open' },
+      { text: 'Уйти', effect: 'fin_door_leave' },
+      { text: 'Сжечь дверь', effect: 'fin_door_burn' }
+    ] },
+    { id: 'fin_confession', title: 'Исповедь', desc: 'Священник в маленькой церкви ждёт. Он готов выслушать тебя. Всё, что ты сделал.', choices: [
+      { text: 'Исповедаться', effect: 'fin_confession_tell' },
+      { text: 'Солгать', effect: 'fin_confession_lie' },
+      { text: 'Уйти', effect: 'fin_confession_leave' }
+    ] },
+    { id: 'fin_mirror', title: 'Последнее зеркало', desc: 'Ты смотришь в зеркало. Видишь себя. Настоящего. Не того, кем ты стал. А того, кем ты был.', choices: [
+      { text: 'Разбить', effect: 'fin_mirror_break' },
+      { text: 'Принять', effect: 'fin_mirror_accept' },
+      { text: 'Улыбнуться', effect: 'fin_mirror_smile' }
+    ] },
+    { id: 'fin_letter', title: 'Письмо себе', desc: 'Ты решаешь написать письмо себе. Прошлому. Тому, кто только начинал. Что ты ему скажешь?', choices: [
+      { text: 'Правду', effect: 'fin_letter_truth' },
+      { text: 'Ложь', effect: 'fin_letter_lie' },
+      { text: 'Ничего', effect: 'fin_letter_nothing' }
+    ] },
+    { id: 'fin_last_call', title: 'Последний звонок', desc: 'Телефон звонит. Ты знаешь, кто это. Если возьмёшь трубку — всё изменится. Если нет — тоже.', choices: [
+      { text: 'Взять', effect: 'fin_last_call_take' },
+      { text: 'Сбросить', effect: 'fin_last_call_drop' },
+      { text: 'Разбить телефон', effect: 'fin_last_call_break' }
+    ] },
+    { id: 'fin_sunrise', title: 'Рассвет', desc: 'Ты стоишь на крыше. Солнце встаёт над городом. Впервые за долгое время — ты видишь его. И думаешь: а стоило ли?', choices: [
+      { text: 'Смотреть', effect: 'fin_sunrise_watch' },
+      { text: 'Прыгнуть', effect: 'fin_sunrise_jump' },
+      { text: 'Спуститься', effect: 'fin_sunrise_down' }
+    ] },
+    { id: 'fin_end', title: 'Конец пути', desc: 'Ты знаешь, что это конец. Дальше — только тьма. Но ты выбираешь, как сделать последний шаг.', choices: [
+      { text: 'Достойно', effect: 'fin_end_dignity' },
+      { text: 'С оружием', effect: 'fin_end_weapon' },
+      { text: 'С улыбкой', effect: 'fin_end_smile' }
+    ] },
+
   ],
 
   // Эффекты (применяются в EventsSystem)
@@ -1455,5 +1710,202 @@ const EventData = {
     crm_pit_bet: { money: -300, sanity: -3, log: 'Ты ставишь. Боец проигрывает. Деньги уходят.', tone: 'bad' },
     crm_pit_fight: { hp: -25, money: 800, rep: 5, log: 'Ты спускаешься в яму. Дерёшься. Побеждаешь. Забираешь деньги. Но ты весь в крови.', tone: 'warn' },
     crm_pit_leave: { sanity: 1, log: 'Ты уходишь. Яма остаётся.', tone: 'info' },
+    
+    // ═══ БЛОК 4: ЭФФЕКТЫ ═══
+    mys_dream_write: { sanity: -5, log: 'Ты записываешь сон. Почерк дрожит. Сон повторяется.', tone: 'warn' },
+    mys_dream_forget: { sanity: +2, stress: -5, log: 'Ты забываешь сон. Утро. Дождь. Всё как обычно.', tone: 'info' },
+    mys_dream_tell: { sanity: -3, rep: +1, log: 'Ты рассказываешь. Собеседник бледнеет. Говорит: "Не рассказывай больше никому".', tone: 'warn' },
+
+    mys_ghost_return: { sanity: -10, stress: +15, log: 'Ты возвращаешься. Её нет. Только мокрое пятно на асфальте.', tone: 'bad' },
+    mys_ghost_drive: { sanity: -5, log: 'Ты гонишь дальше. В зеркале — пусто. Но ты знаешь, что она смотрела.', tone: 'warn' },
+    mys_ghost_pray: { sanity: +2, stress: -10, log: 'Ты крестишься. Свет фар уходит. Страх отступает.', tone: 'good' },
+
+    mys_premonition_home: { money: -100, sanity: +3, log: 'Ты остаёшься дома. День проходит спокойно. Ты не знаешь, что бы случилось.', tone: 'good' },
+    mys_premonition_normal: { hp: -10, sanity: -3, log: 'Ты выходишь. Всё как обычно. Но чувство не проходит.', tone: 'warn' },
+    mys_premonition_weapon: { money: -200, sanity: -2, log: 'Ты покупаешь пистолет. Предчувствие уходит. Ты готов.', tone: 'warn' },
+
+    mys_coincidence_approach: { sanity: -8, log: 'Ты подходишь. Он улыбается. Говорит: "Я ждал тебя". Уходит. Ты стоишь.', tone: 'bad' },
+    mys_coincidence_follow: { sanity: -5, heat: +5, log: 'Ты следуешь за ним. Он идёт в переулок. Исчезает. Ты остаёшься один.', tone: 'warn' },
+    mys_coincidence_ignore: { sanity: -2, log: 'Ты игнорируешь. Он не появляется снова.', tone: 'info' },
+
+    mys_mirror_voice_listen: { sanity: -15, stress: +25, log: 'Ты слушаешь. Отражение шепчет: "Ты умрёшь сегодня". Ты выбегаешь из комнаты.', tone: 'bad' },
+    mys_mirror_voice_break: { hp: -10, sanity: -10, log: 'Ты разбиваешь зеркало. Осколки летят. Кровь на руке. Голос замолкает.', tone: 'bad' },
+    mys_mirror_voice_turn: { sanity: -3, log: 'Ты отворачиваешься. Голос стихает. На время.', tone: 'warn' },
+
+    mys_phone_listen: { sanity: -15, stress: +20, log: 'Ты слушаешь. Шёпот говорит: "Я жду тебя здесь". Гудки.', tone: 'bad' },
+    mys_phone_hangup: { sanity: -3, log: 'Ты сбрасываешь. Телефон молчит. Потом звонит снова.', tone: 'warn' },
+    mys_phone_callback: { sanity: -10, heat: +5, log: 'Ты перезваниваешь. Голос: "Не надо было перезванивать". Ты слышишь выстрел.', tone: 'bad' },
+
+    mys_blood_open: { hp: -5, sanity: -15, stress: +20, log: 'Ты открываешь комнату. Внутри — тело. Ты не помнишь, как его убил.', tone: 'bad' },
+    mys_blood_close: { sanity: -5, log: 'Ты закрываешь дверь. Следы остаются. Кровь остаётся.', tone: 'warn' },
+    mys_blood_cops: { heat: -5, money: -300, sanity: -3, log: 'Копы приезжают. Тело убирают. Ты платишь за молчание.', tone: 'warn' },
+
+    mys_double_meet: { sanity: -20, hp: -10, log: 'Ты выходишь. Он смотрит на тебя. Улыбается твоей улыбкой. Уходит. Ты стоишь.', tone: 'bad' },
+    mys_double_ask: { sanity: -8, log: 'Бармен говорит: "Он был похож на тебя. Очень похож. Это странно".', tone: 'bad' },
+    mys_double_leave: { sanity: -5, heat: +3, log: 'Ты уходишь. Оборачиваешься. Он выходит из бара. Смотрит вслед.', tone: 'warn' },
+
+    mys_music_enter: { sanity: -15, stress: +15, log: 'Ты входишь. Музыка прекращается. В комнате — никого. Пианино закрыто.', tone: 'bad' },
+    mys_music_listen: { sanity: -5, stress: +10, log: 'Ты слушаешь. Музыка становится громче. Потом стихает. Тишина.', tone: 'warn' },
+    mys_music_leave: { sanity: -2, log: 'Ты уходишь. Музыка продолжает играть в твоей голове.', tone: 'info' },
+
+    dth_funeral_approach: { sanity: -3, log: 'Ты подходишь к гробу. Лицо спокойное. Он мёртв. Но спокоен.', tone: 'info' },
+    dth_funeral_give: { money: -300, rep: +3, sanity: +2, log: 'Ты даёшь денег семье. Они благодарят. Ты уходишь.', tone: 'good' },
+    dth_funeral_leave: { sanity: -2, log: 'Ты уходишь тихо. Никто не замечает.', tone: 'info' },
+
+    dth_dying_listen: { sanity: -5, rep: +3, log: 'Он говорит: "Прости меня". Умирает. Ты не знаешь, за что.', tone: 'info' },
+    dth_dying_call: { money: -100, sanity: +3, log: 'Ты вызываешь скорую. Они увозят его. Живой? Ты не узнаешь.', tone: 'good' },
+    dth_dying_leave: { sanity: -3, log: 'Ты проходишь мимо. Через час его уже нет. Ты не оборачиваешься.', tone: 'bad' },
+
+    dth_inheritance_take: { money: 2000, heat: +5, sanity: -3, log: 'Ты вступаешь. В доме — деньги, бумаги, тайны. И враги.', tone: 'warn' },
+    dth_inheritance_refuse: { sanity: +2, log: 'Ты отказываешься. Дом продают. Деньги уходят государству.', tone: 'info' },
+    dth_inheritance_sell: { money: 3000, sanity: +3, log: 'Ты продаёшь дом. Деньги твои. Тайны остаются.', tone: 'good' },
+
+    dth_memory_stand: { sanity: -3, stress: -5, log: 'Ты стоишь. Вспоминаешь. Его лицо. Его голос. Ты не помнишь, как его зовут.', tone: 'warn' },
+    dth_memory_pray: { sanity: +3, stress: -10, log: 'Ты молишься. Не знаешь, кому. Но становится легче.', tone: 'good' },
+    dth_memory_leave: { sanity: -2, log: 'Ты проходишь мимо. Память остаётся.', tone: 'info' },
+
+    dth_grave_remove: { sanity: -10, hp: -5, log: 'Ты убираешь надгробие. Под ним — пустая могила. Кто-то шутит.', tone: 'bad' },
+    dth_grave_ask: { sanity: -5, heat: +3, log: 'Смотритель говорит: "Я не знаю, кто заказал. Но заплатили хорошо".', tone: 'warn' },
+    dth_grave_leave: { sanity: -3, stress: +10, log: 'Ты уходишь. Дата приближается. Ты не знаешь, что будет.', tone: 'bad' },
+
+    dth_lastword_do: { sanity: +5, rep: +2, log: 'Ты отдаёшь письмо. Человек читает. Плачет. Благодарит. Ты уходишь.', tone: 'good' },
+    dth_lastword_refuse: { sanity: -3, log: 'Ты отказываешься. Старик умирает. Письмо остаётся у тебя.', tone: 'bad' },
+    dth_lastword_burn: { sanity: -5, stress: +10, log: 'Ты сжигаешь письмо. Старик умирает. Ты никогда не узнаешь, что было внутри.', tone: 'bad' },
+
+    dth_will_forge: { money: 5000, heat: +10, sanity: -8, log: 'Ты подделываешь. Деньги идут. Но кто-то знает.', tone: 'warn' },
+    dth_will_keep: { sanity: -2, log: 'Ты оставляешь. Всё как есть. Деньги уходят другому.', tone: 'info' },
+    dth_will_destroy: { sanity: -5, money: 2000, log: 'Ты уничтожаешь завещание. Деньги делятся по-другому. Не в твою пользу.', tone: 'bad' },
+
+    dth_graveyard_shift_accept: { money: 300, sanity: -8, log: 'Ты соглашаешься. Ночь. Кладбище. Тени. Ты не спишь.', tone: 'warn' },
+    dth_graveyard_shift_refuse: { sanity: +2, log: 'Ты отказываешься. Сторож уходит. Ночь остаётся его.', tone: 'info' },
+    dth_graveyard_shift_ask: { sanity: -3, log: 'Ты спрашиваешь. Он говорит: "Иногда здесь ходят. Не обращай внимания".', tone: 'warn' },
+
+    dth_photograph_find: { sanity: -5, heat: +3, log: 'Ты ищешь. Находишь одного. Он жив. Он не помнит тебя.', tone: 'warn' },
+    dth_photograph_burn: { sanity: -3, stress: +10, log: 'Ты сжигаешь. Фото горит. Лица исчезают.', tone: 'warn' },
+    dth_photograph_keep: { sanity: -2, log: 'Ты оставляешь. Фото в альбоме. Ты время от времени смотришь.', tone: 'info' },
+
+    dth_ghost_town_enter: { sanity: -15, hp: -5, log: 'Ты входишь. Тени двигаются. Голоса шепчут. Ты выбегаешь.', tone: 'bad' },
+    dth_ghost_town_watch: { sanity: -8, stress: +15, log: 'Ты смотришь. Огни горят. Тени двигаются. Утром — пусто.', tone: 'bad' },
+    dth_ghost_town_leave: { sanity: -2, log: 'Ты уходишь. Район остаётся.', tone: 'info' },
+
+    mor_child_give: { money: -50, sanity: +5, rep: +2, log: 'Ты даёшь денег. Он улыбается. Ты уходишь.', tone: 'good' },
+    mor_child_food: { money: -80, sanity: +8, rep: +3, log: 'Ты покупаешь еду. Он ест. Ты смотришь. Уходишь.', tone: 'good' },
+    mor_child_leave: { sanity: -5, log: 'Ты проходишь мимо. Он остаётся на улице. Под дождём.', tone: 'bad' },
+
+    mor_dying_enemy_kill: { sanity: -10, heat: +10, log: 'Ты добиваешь. Он умирает. Ты смотришь. Потом уходишь.', tone: 'bad' },
+    mor_dying_enemy_help: { money: -300, rep: +5, sanity: +5, log: 'Ты вызываешь врача. Он выживает. Он этого не забудет.', tone: 'good' },
+    mor_dying_enemy_leave: { sanity: -5, log: 'Ты уходишь. Он умирает один. Ты не оборачиваешься.', tone: 'bad' },
+
+    mor_stolen_goods_return: { rep: +5, sanity: +5, log: 'Ты возвращаешь лекарства. Больница благодарна. Твой человек — нет.', tone: 'good' },
+    mor_stolen_goods_keep: { money: 500, sanity: -3, log: 'Ты оставляешь. Лекарства твои. Люди умирают.', tone: 'bad' },
+    mor_stolen_goods_sell: { money: 1000, sanity: -5, log: 'Ты продаёшь. Деньги твои. Больница без лекарств.', tone: 'bad' },
+
+    mor_witness_pay: { money: -200, sanity: -3, log: 'Ты платишь. Он берёт. Молчит. Уходит.', tone: 'warn' },
+    mor_witness_release: { sanity: -2, heat: +5, log: 'Ты отпускаешь. Он уходит. Ты знаешь: он расскажет.', tone: 'warn' },
+    mor_witness_kill: { sanity: -20, heat: +20, rep: -10, log: 'Ты убиваешь ребёнка. Это последнее, что ты делаешь в этом городе.', tone: 'bad' },
+
+    mor_prostitute_protect: { hp: -10, rep: +5, sanity: +5, log: 'Ты защищаешь её. Сутенёр уходит. Она благодарит. Ты уходишь.', tone: 'good' },
+    mor_prostitute_leave: { sanity: -3, log: 'Ты прогоняешь её. Она уходит. Кто-то другой ей поможет. Или нет.', tone: 'warn' },
+    mor_prostitute_betray: { money: 300, sanity: -8, rep: -3, log: 'Ты сдаёшь её. Сутенёр платит. Она кричит. Ты уходишь.', tone: 'bad' },
+
+    mor_traitor_kill: { sanity: -10, rep: +3, heat: +5, log: 'Ты убиваешь друга. Он падает. Ты смотришь. Потом уходишь.', tone: 'bad' },
+    mor_traitor_forgive: { sanity: +5, rep: -3, log: 'Ты прощаешь. Он плачет. Он будет верен. Пока.', tone: 'good' },
+    mor_traitor_exile: { sanity: -2, rep: +2, log: 'Ты изгоняешь его. Он уходит. Больше ты его не увидишь.', tone: 'warn' },
+
+    mor_drugs_give: { money: -50, sanity: -3, log: 'Ты даёшь денег. Он покупает дозу. Умирает через месяц.', tone: 'bad' },
+    mor_drugs_food: { money: -80, sanity: +5, log: 'Ты покупаешь еды. Он ест. Плачет. Обнимает тебя.', tone: 'good' },
+    mor_drugs_leave: { sanity: -3, log: 'Ты проходишь мимо. Он остаётся на улице.', tone: 'warn' },
+
+    mor_orphanage_donate: { money: -500, rep: +5, sanity: +8, log: 'Ты жертвуешь. Дети едят. Ты уходишь с лёгким сердцем.', tone: 'good' },
+    mor_orphanage_refuse: { sanity: -3, log: 'Ты отказываешь. Он уходит. Дети голодают.', tone: 'bad' },
+    mor_orphanage_check: { money: -500, sanity: +5, log: 'Ты проверяешь. Он честный. Ты жертвуешь. Дети едят.', tone: 'good' },
+
+    mor_lottery_return: { money: -1000, rep: +10, sanity: +5, log: 'Ты возвращаешь билет. Она плачет. Благодарит. Ты уходишь.', tone: 'good' },
+    mor_lottery_keep: { money: 5000, sanity: -8, log: 'Ты оставляешь себе. Деньги твои. Она не узнает.', tone: 'bad' },
+    mor_lottery_share: { money: 2500, sanity: +2, rep: +3, log: 'Ты делишь. Она удивлена. Ты уходишь с половиной.', tone: 'good' },
+
+    mor_beggar_all: { money: -500, sanity: +10, rep: +5, log: 'Ты отдаёшь всё. Она плачет. Ребёнок улыбается. Ты уходишь пустым. Но живым.', tone: 'good' },
+    mor_beggar_some: { money: -100, sanity: +3, log: 'Ты даёшь немного. Она кивает. Уходит.', tone: 'info' },
+    mor_beggar_leave: { sanity: -5, log: 'Ты проходишь мимо. Ребёнок плачет. Ты уходишь.', tone: 'bad' },
+
+    rnd_brick_up: { sanity: -3, log: 'Ты смотришь наверх. Никого. Только голуби. Ты уходишь.', tone: 'info' },
+    rnd_brick_leave: { sanity: +1, log: 'Ты уходишь быстрее. Кирпич остаётся.', tone: 'info' },
+    rnd_brick_take: { sanity: -1, log: 'Ты забираешь кирпич. Тяжёлый. Пригодится.', tone: 'warn' },
+
+    rnd_lottery_check: { money: 1000, sanity: +5, log: 'Ты проверяешь. Выигрыш. Тысяча. Ты уходишь с деньгами.', tone: 'good' },
+    rnd_lottery_throw: { sanity: -1, log: 'Ты выбрасываешь. Билет летит в лужу. Ты не узнаешь, что было бы.', tone: 'info' },
+    rnd_lottery_sell: { money: 200, log: 'Ты продаёшь. Покупатель улыбается. Ты тоже.', tone: 'good' },
+
+    rnd_oldfriend_talk: { sanity: +5, stress: -10, log: 'Вы говорите. Час. Два. Вспоминаете. Он уходит. Ты улыбаешься.', tone: 'good' },
+    rnd_oldfriend_leave: { sanity: -2, log: 'Ты уходишь. Он смотрит вслед. Ты не оборачиваешься.', tone: 'warn' },
+    rnd_oldfriend_drink: { money: -100, sanity: +8, stress: -15, log: 'Вы пьёте вместе. Много. Потом ещё. Утро. Он уходит.', tone: 'good' },
+
+    rnd_lost_thing_search: { sanity: -3, hp: -5, log: 'Ты ищешь. Находишь не то. Устаёшь. Садишься на скамейку.', tone: 'warn' },
+    rnd_lost_thing_forget: { sanity: +2, log: 'Ты забываешь. Что-то было. Но его нет. Ты живёшь дальше.', tone: 'info' },
+    rnd_lost_thing_buy: { money: -300, sanity: +3, log: 'Ты покупаешь замену. Не то. Но работает.', tone: 'info' },
+
+    rnd_wallet_return: { rep: +5, money: 100, sanity: +5, log: 'Ты возвращаешь. Хозяин благодарит. Даёт сотню. Ты уходишь.', tone: 'good' },
+    rnd_wallet_take: { money: 300, sanity: -5, log: 'Ты забираешь деньги. Бумажник выбрасываешь. Фото ребёнка остаётся на асфальте.', tone: 'bad' },
+    rnd_wallet_leave: { sanity: +1, log: 'Ты не трогаешь. Бумажник остаётся. Кто-то другой найдёт.', tone: 'info' },
+
+    rnd_stranger_follow: { sanity: -3, heat: +3, log: 'Ты следуешь. Он идёт в переулок. Исчезает. Ты остаёшься с ключом.', tone: 'warn' },
+    rnd_stranger_find: { money: 1000, sanity: -5, log: 'Ты находишь замок. Открываешь. Внутри — деньги. Кто-то хотел, чтобы ты их нашёл.', tone: 'warn' },
+    rnd_stranger_throw: { sanity: +1, log: 'Ты выбрасываешь ключ в реку. Он тонет. Ты уходишь.', tone: 'info' },
+
+    rnd_fire_fire: { hp: -15, rep: +5, money: -200, log: 'Ты тушишь. Огонь отступает. Ты спасаешь квартиру.', tone: 'good' },
+    rnd_fire_save: { hp: -10, money: -100, sanity: +3, log: 'Ты спасаешь вещи. Главное — успел.', tone: 'good' },
+    rnd_fire_run: { money: -500, sanity: -5, log: 'Ты бежишь. Квартира сгорает. Вещи уничтожены.', tone: 'bad' },
+
+    rnd_umbrella_take: { money: 50, sanity: +3, log: 'Ты забираешь зонт. Дождь не страшен. Владелец не появится.', tone: 'good' },
+    rnd_umbrella_leave: { sanity: +1, log: 'Ты оставляешь. Промокаешь. Но совесть чиста.', tone: 'info' },
+    rnd_umbrella_wait: { sanity: -2, hp: -5, log: 'Ты ждёшь. Час. Никто не приходит. Ты уходишь. Промокший.', tone: 'warn' },
+
+    rnd_wind_money_catch: { money: 200, heat: +5, sanity: -3, log: 'Ты ловишь. Купюры в руках. Хозяин кричит. Ты убегаешь.', tone: 'warn' },
+    rnd_wind_money_help: { rep: +3, sanity: +5, log: 'Ты помогаешь. Хозяин благодарит. Даёт сотню. Ты уходишь.', tone: 'good' },
+    rnd_wind_money_watch: { sanity: +1, log: 'Ты смотришь. Люди собирают. Хозяин плачет. Ты уходишь.', tone: 'info' },
+
+    rnd_photograph_take: { sanity: -5, log: 'Ты забираешь фото. Смотришь. Ты счастлив. Ты не помнишь этого.', tone: 'warn' },
+    rnd_photograph_find: { sanity: -3, rep: +2, log: 'Ты находишь хозяина. Он плачет. Обнимает тебя. Ты не знаешь его.', tone: 'info' },
+    rnd_photograph_leave: { sanity: -1, log: 'Ты оставляешь. Фото уносит ветер.', tone: 'info' },
+
+    fin_lastchance_go: { money: -1000, sanity: +20, stress: -30, rep: 0, log: 'Ты уезжаешь. Город остаётся в зеркале. Новое имя. Новая жизнь. Ты свободен.', tone: 'good' },
+    fin_lastchance_stay: { sanity: -5, stress: +10, rep: +5, log: 'Ты остаёшься. Город — твой. Ты не сдаёшься.', tone: 'good' },
+    fin_lastchance_burn: { sanity: -10, stress: +20, hp: -10, log: 'Ты сжигаешь билет. Обратной дороги нет. Ты остаёшься навсегда.', tone: 'bad' },
+
+    fin_reckoning_fight: { hp: -30, sanity: -10, rep: +8, log: 'Ты дерёшься. Долго. Жёстко. Побеждаешь. Он мёртв. Ты жив.', tone: 'warn' },
+    fin_reckoning_pay: { money: -2000, sanity: +5, log: 'Ты платишь. Он уходит. Долг закрыт. Ты свободен.', tone: 'good' },
+    fin_reckoning_beg: { sanity: -15, rep: -5, log: 'Ты просишь. Он смеётся. Уходит. Ты остаёшься на коленях.', tone: 'bad' },
+
+    fin_redemption_save: { hp: -20, sanity: +15, rep: +10, log: 'Ты спасаешь. Теряешь всё. Но человек жив. Это главное.', tone: 'good' },
+    fin_redemption_refuse: { sanity: -10, rep: -5, log: 'Ты отказываешься. Человек умирает. Ты живёшь. Пока.', tone: 'bad' },
+    fin_redemption_compromise: { money: -1000, sanity: +5, rep: +3, log: 'Ты находишь компромисс. Человек жив. Ты почти свободен.', tone: 'good' },
+
+    fin_door_open: { sanity: -5, money: 2000, rep: +5, log: 'Ты открываешь. За дверью — всё, что ты хотел. И всё, чего боялся.', tone: 'good' },
+    fin_door_leave: { sanity: +3, log: 'Ты уходишь. Дверь остаётся закрытой. Ты живёшь дальше.', tone: 'info' },
+    fin_door_burn: { heat: +20, sanity: -10, rep: -5, log: 'Ты сжигаешь дверь. Никто не пройдёт. Ты тоже.', tone: 'bad' },
+
+    fin_confession_tell: { sanity: +15, stress: -20, log: 'Ты исповедуешься. Всё. Он слушает. Отпускает грехи. Ты уходишь легче.', tone: 'good' },
+    fin_confession_lie: { sanity: -5, log: 'Ты лжёшь. Он кивает. Не верит. Ты уходишь.', tone: 'warn' },
+    fin_confession_leave: { sanity: -3, log: 'Ты уходишь. Он смотрит вслед. Ты не оборачиваешься.', tone: 'info' },
+
+    fin_mirror_break: { hp: -10, sanity: -10, log: 'Ты разбиваешь. Осколки. Кровь. Отражение исчезает. Ты остаёшься.', tone: 'bad' },
+    fin_mirror_accept: { sanity: +10, stress: -15, log: 'Ты принимаешь. Себя. Каким стал. Каким был. Ты уходишь.', tone: 'good' },
+    fin_mirror_smile: { sanity: +5, stress: -10, log: 'Ты улыбаешься. Впервые за долгое время. Отражение улыбается в ответ.', tone: 'good' },
+
+    fin_letter_truth: { sanity: +5, log: 'Ты пишешь правду. Всё. Без прикрас. Письмо готово. Ты его не отправишь.', tone: 'info' },
+    fin_letter_lie: { sanity: -3, log: 'Ты пишешь ложь. Всё хорошо. Ты справишься. Ты знаешь, что это не так.', tone: 'warn' },
+    fin_letter_nothing: { sanity: -1, log: 'Ты не пишешь. Бумага остаётся пустой. Как и должно быть.', tone: 'info' },
+
+    fin_last_call_take: { sanity: -10, stress: +15, log: 'Ты берёшь. Голос: "Я знаю, что ты сделал". Гудки. Ты стоишь.', tone: 'bad' },
+    fin_last_call_drop: { sanity: -3, log: 'Ты сбрасываешь. Телефон звонит ещё раз. Ты не берёшь.', tone: 'warn' },
+    fin_last_call_break: { hp: -5, sanity: -5, log: 'Ты разбиваешь телефон. Осколки. Тишина. Наконец-то тишина.', tone: 'bad' },
+
+    fin_sunrise_watch: { sanity: +10, stress: -20, log: 'Ты смотришь. Солнце встаёт. Город просыпается. Ты улыбаешься.', tone: 'good' },
+    fin_sunrise_jump: { hp: -100, sanity: -20, log: 'Ты прыгаешь. Конец. Тихо. Спокойно. Наконец-то.', tone: 'bad' },
+    fin_sunrise_down: { sanity: +5, stress: -10, log: 'Ты спускаешься. День начинается. Ты живёшь. Пока.', tone: 'good' },
+
+    fin_end_dignity: { sanity: +15, stress: -25, log: 'Ты уходишь с достоинством. Никто не забудет. Город запомнит.', tone: 'good' },
+    fin_end_weapon: { hp: -20, heat: +20, sanity: -5, log: 'Ты уходишь с оружием. Стреляя. Крича. Ты живой. Пока.', tone: 'warn' },
+    fin_end_smile: { sanity: +10, stress: -20, log: 'Ты уходишь с улыбкой. Странно. Но ты свободен. Наконец-то.', tone: 'good' },
   },
 };
