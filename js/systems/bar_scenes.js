@@ -5,7 +5,9 @@ const BarSystem = {
     if ((p.barVisitsToday || 0) >= 2) {
       return { id: 'limit_reached', title: 'Бармен устал', desc: 'Бармен вытирает стакан грязной тряпкой. «Ты сегодня уже дважды тут всё обшарил. Иди, проветрись».', choices: [ { text: 'Уйти', action: 'none', log: 'Ты выходишь на улицу.' } ] };
     }
-    let available = BarScenes.filter(s => {
+    // ═══ ПРИОРИТЕТ: СЛУХИ (repeatable) если сюжетные кончились ═══
+    const story = BarScenes.filter(s => {
+      if (s.repeatable) return false;
       if (p.barHistory.includes(s.id)) return false;
       if (s.requires) {
         if (s.requires.minHeat && p.heat < s.requires.minHeat) return false;
@@ -15,10 +17,23 @@ const BarSystem = {
       }
       return true;
     });
-    if (available.length === 0) {
-      return { id: 'empty_bar', title: 'Пустота', desc: 'Ты смотришь по сторонам. Те же лица. Тот же дым. Все истории в этом баре ты уже слышал. Ты заказываешь ещё одну бутылку.', choices: [ { text: 'Пить в одиночестве', action: 'drink_alone', log: 'Ты пьёшь, пока мир не станет размытым. Стресс уходит, но рассудок трещит по швам.' } ] };
-    }
-    return Utils.pick(available);
+    const rumors = BarScenes.filter(s => {
+      if (!s.repeatable) return false;
+      if (s.requires) {
+        if (s.requires.minHeat && p.heat < s.requires.minHeat) return false;
+        if (s.requires.minMoney && p.money < s.requires.minMoney) return false;
+        if (s.requires.minLevel && p.level < s.requires.minLevel) return false;
+        if (s.requires.minHour && State.time.hour < s.requires.minHour) return false;
+      }
+      return true;
+    });
+    
+    // 60% сюжетная (если есть), иначе слух, иначе пустота
+    if (story.length > 0 && Utils.chance(0.6)) return Utils.pick(story);
+    if (rumors.length > 0) return Utils.pick(rumors);
+    if (story.length > 0) return Utils.pick(story);
+    
+    return { id: 'empty_bar', title: 'Пустота', desc: 'Ты смотришь по сторонам. Те же лица. Тот же дым. Все истории в этом баре ты уже слышал. Ты заказываешь ещё одну бутылку.', choices: [ { text: 'Пить в одиночестве', action: 'drink_alone', log: 'Ты пьёшь, пока мир не станет размытым. Стресс уходит, но рассудок трещит по швам.' } ] };
   },
   resolve(sceneId, choiceIndex) {
     if (sceneId === 'limit_reached') return Engine.go('bar');
@@ -38,7 +53,7 @@ const BarSystem = {
     if (!scene) return;
     const choice = scene.choices[choiceIndex];
     if (!choice) return;
-    if (!State.player.barHistory.includes(sceneId)) State.player.barHistory.push(sceneId);
+    if (!scene.repeatable && !State.player.barHistory.includes(sceneId)) State.player.barHistory.push(sceneId);
     State.player.barVisitsToday = (State.player.barVisitsToday || 0) + 1;
     let logText = choice.log || 'Ты уходишь.';
     if (choice.action === 'reward_money') Economy.earn(choice.value, 'Сделка в баре');
