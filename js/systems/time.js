@@ -155,6 +155,7 @@ const Time = {
     // Heat медленно падает
     if (typeof Politics !== 'undefined' && Politics.checkElection) Politics.checkElection();
     if (typeof WomenSystem !== 'undefined' && WomenSystem.checkFights) WomenSystem.checkFights();
+    if (typeof PersonalEnemies !== 'undefined' && PersonalEnemies.tick) PersonalEnemies.tick();
     if (State.player.heat > 0 && Utils.chance(0.3)) {
       State.player.heat = Math.max(0, State.player.heat - 1);
     }

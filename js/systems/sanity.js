@@ -109,6 +109,7 @@ const Sanity = {
       // «Убил кого-то без памяти»
       State.player.heat = Math.min(100, State.player.heat + 15);
       State.player.lifetime.kills++;
+      if (typeof PersonalEnemies !== 'undefined' && PersonalEnemies.onKill) PersonalEnemies.onKill('неизвестный', State.player.level);
       Engine.log('На руках кровь. Ты не помнишь, чья.', 'bad');
     }
 

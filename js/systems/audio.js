@@ -1,67 +1,104 @@
-// ═══ УМНАЯ СИСТЕМА МУЗЫКИ ═══
+// ═══ МУЗЫКА (Web Audio API — не выходит из WebView) ═══
 const Music = {
   bgPlaylist: ['assets/music/bg.mp3', 'assets/music/bg2.wav'],
   combatTrack: 'assets/music/combat.wav',
   currentBg: 0,
-  player: null,
+  ctx: null,
+  masterGain: null,
+  buffers: {},
+  currentSource: null,
   enabled: false,
   inCombat: false,
+  _loading: {},
 
   init() {
-    if (this.player) return;
-    this.player = document.createElement('audio');
-    this.player.volume = 0.15;
-    this.player.loop = false; // Фон крутится, потом переключается
-
-    // Переключение трека после окончания
-    this.player.addEventListener('ended', () => {
-      if (!this.enabled || this.inCombat) return;
-      this.currentBg = (this.currentBg + 1) % this.bgPlaylist.length;
-      this.player.src = this.bgPlaylist[this.currentBg];
-      this.player.play().catch(e => console.warn(e));
-    });
-
-    // Страховка для WebView, если ended не сработал
-    setInterval(() => {
-      if (!this.enabled || !this.player || !this.player.src) return;
-      if (this.player.paused) {
-        if (this.player.duration && this.player.currentTime >= this.player.duration - 0.5) {
-          if (this.inCombat) {
-            this.player.currentTime = 0;
-          } else {
-            this.currentBg = (this.currentBg + 1) % this.bgPlaylist.length;
-            this.player.src = this.bgPlaylist[this.currentBg];
-          }
-        }
-        this.player.play().catch(() => {});
-      }
-    }, 3000);
-
-    // По умолчанию музыка выключена, чтобы не было конфликтов с WebView
-    // Включается только вручную кнопкой ♪
-    try { 
-      if (localStorage.getItem('noir_audio') === 'on') this.enabled = true; 
-    } catch (e) {}
+    if (this.ctx) return;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AC();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = 0.15;
+      this.masterGain.connect(this.ctx.destination);
+      try { if (localStorage.getItem('noir_audio') === 'on') this.enabled = true; } catch (e) {}
+    } catch (e) { console.warn('AudioContext недоступен', e); }
   },
 
-  start() {
-    this.init();
-    if (!this.player) return;
-    if (!this.player.src) {
-      this.player.src = this.inCombat ? this.combatTrack : this.bgPlaylist[this.currentBg];
+  resume() {
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+  },
+
+  _loadBuffer(url) {
+    if (this.buffers[url]) return Promise.resolve(this.buffers[url]);
+    if (this._loading[url]) return this._loading[url];
+    if (!this.ctx) return Promise.resolve(null);
+    // XMLHttpRequest работает и на http://, и на file://
+    this._loading[url] = new Promise((resolve) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.responseType = 'arraybuffer';
+      xhr.onload = () => {
+        // status 0 = file://, status 200 = http://
+        if (xhr.status === 200 || xhr.status === 0) {
+          this.ctx.decodeAudioData(
+            xhr.response,
+            (buf) => { this.buffers[url] = buf; delete this._loading[url]; resolve(buf); },
+            (err) => { console.warn('decodeAudioData fail:', url, err); delete this._loading[url]; resolve(null); }
+          );
+        } else {
+          console.warn('Music HTTP', xhr.status, url);
+          delete this._loading[url];
+          resolve(null);
+        }
+      };
+      xhr.onerror = () => { console.warn('Music XHR error:', url); delete this._loading[url]; resolve(null); };
+      xhr.send();
+    });
+    return this._loading[url];
+  },
+
+  async _play(url, loop) {
+    if (!this.ctx || !this.masterGain) return;
+    if (this.currentSource) {
+      try { this.currentSource.stop(); } catch (e) {}
+      this.currentSource = null;
     }
-    this.player.loop = this.inCombat;
-    this.player.play().then(() => {
-      this.enabled = true;
-      try { localStorage.setItem('noir_audio', 'on'); } catch (e) {}
-      if (typeof Engine !== 'undefined') Engine.updateTopbar();
-    }).catch(e => console.warn('Ошибка аудио:', e));
+    const buf = await this._loadBuffer(url);
+    if (!buf) return;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = loop;
+    src.connect(this.masterGain);
+    src.onended = () => {
+      if (!this.enabled || this.inCombat) return;
+      this.currentBg = (this.currentBg + 1) % this.bgPlaylist.length;
+      this._play(this.bgPlaylist[this.currentBg], false);
+    };
+    src.start(0);
+    this.currentSource = src;
+  },
+
+  async start() {
+    this.init();
+    this.resume();
+    if (!this.ctx) return;
+    this.enabled = true;
+    try { localStorage.setItem('noir_audio', 'on'); } catch (e) {}
+    if (typeof Engine !== 'undefined') Engine.updateTopbar();
+    const url = this.inCombat ? this.combatTrack : this.bgPlaylist[this.currentBg];
+    this.masterGain.gain.value = this.inCombat ? 0.25 : 0.15;
+    await this._play(url, this.inCombat);
+    // Preload остальных в фоне (через 3 сек, чтобы не тормозить старт)
+    setTimeout(() => {
+      this.bgPlaylist.forEach(u => { if (!this.buffers[u]) this._loadBuffer(u); });
+      if (!this.buffers[this.combatTrack]) this._loadBuffer(this.combatTrack);
+    }, 3000);
   },
 
   stop() {
-    this.init();
-    if (!this.player) return;
-    this.player.pause();
+    if (this.currentSource) {
+      try { this.currentSource.stop(); } catch (e) {}
+      this.currentSource = null;
+    }
     this.enabled = false;
     try { localStorage.setItem('noir_audio', 'off'); } catch (e) {}
     if (typeof Engine !== 'undefined') Engine.updateTopbar();
@@ -69,24 +106,24 @@ const Music = {
 
   toggle() { if (this.enabled) this.stop(); else this.start(); },
 
-  playCombat() {
-    this.init();
-    if (!this.enabled || !this.player) return;
+  async playCombat() {
     this.inCombat = true;
-    this.player.loop = true;
-    this.player.src = this.combatTrack;
-    this.player.volume = 0.25; // В бою делаем чуть громче
-    this.player.play().catch(e => console.warn(e));
+    if (!this.enabled) return;
+    this.init();
+    this.resume();
+    if (!this.ctx) return;
+    this.masterGain.gain.value = 0.25;
+    await this._play(this.combatTrack, true);
   },
 
-  playBackground() {
-    this.init();
-    if (!this.enabled || !this.player) return;
+  async playBackground() {
     this.inCombat = false;
-    this.player.loop = false;
-    this.player.src = this.bgPlaylist[this.currentBg];
-    this.player.volume = 0.15; // В городе — тихий фон
-    this.player.play().catch(e => console.warn(e));
+    if (!this.enabled) return;
+    this.init();
+    this.resume();
+    if (!this.ctx) return;
+    this.masterGain.gain.value = 0.15;
+    await this._play(this.bgPlaylist[this.currentBg], false);
   }
 };
 

@@ -1,0 +1,87 @@
+name: Build Release APK
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Cordova, cordova-res, Pillow
+      run: |
+        npm install -g cordova cordova-res
+        pip install Pillow
+
+    - name: Create and Build App
+      run: |
+        cordova create app io.github.ton0017.mafia "City of Noir"
+        cd app
+
+        python3 -c "import json; pkg = json.load(open('package.json')); pkg['type']='commonjs'; json.dump(pkg, open('package.json','w'), indent=2)"
+        rm -rf ~/.cordova ~/.plugman
+        cordova platform add android
+
+        mkdir -p resources/android
+        python3 -c "
+        from PIL import Image, ImageDraw
+        def draw_ace(size):
+            img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(img)
+            margin = size // 10
+            w, h = size - margin*2, size - margin*2
+            draw.rounded_rectangle([margin, margin, margin+w, margin+h], radius=size//15, fill=(232, 232, 232, 255))
+            cx, cy = size//2, size//2 + size//20
+            r = size // 7
+            draw.ellipse([cx-r, cy-r, cx, cy], fill=(163, 38, 38, 255))
+            draw.ellipse([cx, cy-r, cx+r, cy], fill=(163, 38, 38, 255))
+            draw.polygon([(cx-r, cy-r//2), (cx+r, cy-r//2), (cx, cy+r+size//10)], fill=(163, 38, 38, 255))
+            lw = max(2, size // 64)
+            draw.line([(margin+20, margin+40), (margin+35, margin+15)], fill=(10, 10, 10, 255), width=lw)
+            draw.line([(margin+35, margin+15), (margin+50, margin+40)], fill=(10, 10, 10, 255), width=lw)
+            draw.line([(margin+27, margin+30), (margin+43, margin+30)], fill=(10, 10, 10, 255), width=lw)
+            draw.line([(margin+w-20, margin+h-40), (margin+w-35, margin+h-15)], fill=(10, 10, 10, 255), width=lw)
+            draw.line([(margin+w-35, margin+h-15), (margin+w-50, margin+h-40)], fill=(10, 10, 10, 255), width=lw)
+            draw.line([(margin+w-27, margin+h-30), (margin+w-43, margin+h-30)], fill=(10, 10, 10, 255), width=lw)
+            return img
+        main_icon = Image.new('RGB', (1024, 1024), (10, 10, 10))
+        main_icon.paste(draw_ace(1024), (0,0), draw_ace(1024))
+        main_icon.save('resources/icon.png')
+        draw_ace(432).save('resources/android/icon-foreground.png')
+        Image.new('RGB', (432, 432), (10, 10, 10)).save('resources/android/icon-background.png')
+        splash = Image.new('RGB', (2732, 2732), (10, 10, 10))
+        splash.paste(main_icon.resize((1024, 1024), Image.Resampling.LANCZOS), ((2732-1024)//2, (2732-1024)//2))
+        splash.save('resources/splash.png')
+        "
+        cordova-res android --skip-config --copy
+
+        sed -i 's|</widget>|  <platform name="android">\n    <icon background="resources/android/icon-background.png" density="mdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="hdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxxhdpi" foreground="resources/android/icon-foreground.png" />\n    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/splash.png" />\n    <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  </platform>\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
+
+        printf '%s\n' '<!DOCTYPE html>' '<html>' '<head>' '<meta charset="utf-8">' '<meta http-equiv="Content-Security-Policy" content="default-src * '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"'; script-src * '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"'; connect-src * '"'"'unsafe-inline'"'"'; img-src * data: blob: '"'"'unsafe-inline'"'"'; frame-src *; style-src * '"'"'unsafe-inline'"'"';">' '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">' '<title>City of Noir</title>' '<style>html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a0a0a; } iframe { border: none; width: 100%; height: 100%; }</style>' '</head>' '<body><iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe></body>' '</html>' > www/index.html
+
+        cd platforms/android/app
+        keytool -genkey -v -keystore release.keystore -alias noir -keyalg RSA -keysize 2048 -validity 10000 -storepass noirpassword -keypass noirpassword -dname "CN=City of Noir, O=Indie, C=RU" || true
+        cd ../../..
+
+        printf '%s\n' '{' '  "android": {' '    "release": {' '      "keystore": "platforms/android/app/release.keystore",' '      "storePassword": "noirpassword",' '      "alias": "noir",' '      "password": "noirpassword"' '    }' '  }' '}' > build.json
+
+        cordova build android --release --buildConfig=build.json -- --packageType=apk
+        echo "=== НАЙДЕННЫЕ APK ==="
+        find platforms/android/app/build/outputs -name "*.apk" -o -name "*.aab" || true
+
+    - name: Upload Build Output
+      uses: actions/upload-artifact@v4
+      with:
+        name: CityOfNoir-Build
+        path: app/platforms/android/app/build/outputs/
+        if-no-files-found: error

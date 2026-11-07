@@ -158,8 +158,13 @@ const Screens = {
         ${Components.button('Автосалоны', 'Actions.go("carsShowrooms")')}
         ${Components.button('Бар', 'Actions.go("bar")')}
         ${Components.button('Работа', 'Actions.go("work")')}
+        ${Components.button('Казино', 'Actions.go("casino")')}
+        ${Components.button('Ресторан', 'Actions.go("restaurant")')}
         ${Components.button('Аптека', 'Actions.go("apothecary")')}
         ${Components.button('Дилер', 'Actions.go("dealer")')}
+        ${((State.player.personalEnemies || []).filter(e => e.status === 'appeared').length > 0)
+          ? Components.button('⚠ Враги (' + (State.player.personalEnemies || []).filter(e => e.status === 'appeared').length + ')', 'Actions.go("personalEnemies")', { danger: true })
+          : ''}
         ${Components.button('Игрок', 'Actions.go("player")')}
       </div>
       <hr>
@@ -167,6 +172,310 @@ const Screens = {
         ${Components.button('Спать', 'Actions.sleep()', { primary: true })}
         ${Components.button('Сохранить в меню', 'Actions.saveAndMenu()')}
       </div>
+    `;
+  },
+
+  blackjackSelect(params) {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const npcId = params && params.npcId;
+    const npc = (State.player.casinoSession && State.player.casinoSession.npcs)
+      ? State.player.casinoSession.npcs.find(n => n.id === npcId)
+      : null;
+    if (!npc) return Engine.go('casino');
+    const cfg = CasinoData.blackjack;
+    const money = State.player.money || 0;
+
+    return `
+      <h2>Стол «Двадцать одно»</h2>
+      <p class="muted">Напротив тебя садится <b>${npc.name}</b>.</p>
+      <p class="small muted">${npc.desc}</p>
+      <hr>
+      <p class="small">Правила: кто ближе к 21, не перебрав — забирает банк.</p>
+      <hr>
+      <h3>Ставка</h3>
+      <p class="small muted">Твои деньги: $${Utils.fmtMoney(money)}</p>
+      <div class="row">
+        ${cfg.bets.map(b => money >= b
+          ? Components.button('$' + b, `Actions.blackjackStart('${npc.id}', ${b})`, { primary: true })
+          : `<span class="small muted">$${b} (не хватает)</span>`
+        ).join(' ')}
+      </div>
+      <hr>
+      ${Components.button('← Назад', 'Actions.go("casino")')}
+    `;
+  },
+
+  blackjack() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const g = State.player.blackjack;
+    if (!g) return Engine.go('casino');
+
+    const playerTotal = (typeof CasinoSystem !== 'undefined') ? CasinoSystem._calcHand(g.playerHand) : 0;
+    const npcHandShown = g.npcHidden
+      ? g.npcHand.map((c, i) => i === 0 ? c.r + c.s : '[?]').join(' ')
+      : g.npcHand.map(c => c.r + c.s).join(' ');
+    const npcTotal = g.npcHidden ? null : ((typeof CasinoSystem !== 'undefined') ? CasinoSystem._calcHand(g.npcHand) : 0);
+
+    // Результат
+    if (g.stage === 'result') {
+      let header = '';
+      if (g.result === 'win') header = '<h2 style="color:#6fa84f">Ты выиграл</h2>';
+      else if (g.result === 'lose' || g.result === 'bust') header = '<h2 style="color:#a32626">Ты проиграл</h2>';
+      else header = '<h2>Ничья</h2>';
+      const net = g.netGain || 0;
+      return `
+        ${header}
+        <p class="muted">Против: <b>${g.npc.name}</b></p>
+        <hr>
+        <p class="small">Твои карты: <b>${g.playerHand.map(c => c.r + c.s).join(' ')}</b> (${playerTotal})</p>
+        <p class="small">Карты «${g.npc.name}»: <b>${g.npcHand.map(c => c.r + c.s).join(' ')}</b> (${npcTotal})</p>
+        <hr>
+        <p class="big ${net >= 0 ? 'green' : 'red'}">${net >= 0 ? '+' : ''}$${Utils.fmtMoney(net)}</p>
+        <div class="row">
+          ${Components.button('Сыграть ещё ($' + g.bet + ')', `Actions.blackjackAgain()`)}
+          ${Components.button('← Выйти из-за стола', 'Actions.blackjackLeave()', { primary: true })}
+        </div>
+      `;
+    }
+
+    // Игра
+    return `
+      <h2>Двадцать одно</h2>
+      <p class="muted">Ты против «${g.npc.name}». ${g.npc.hint || ''}</p>
+      <hr>
+      <div class="grid-2">
+        <div class="card hot">
+          <h3 style="text-align:center; margin:0 0 0.5rem 0;">ТЫ</h3>
+          <p class="small center" style="font-size:1.4em; color:white; margin:0.5rem 0"><b>${g.playerHand.map(c => c.r + c.s).join(' ')}</b></p>
+          <p class="small center gold">Сумма: ${playerTotal}</p>
+        </div>
+        <div class="card">
+          <h3 style="text-align:center; margin:0 0 0.5rem 0;">${g.npc.name.toUpperCase()}</h3>
+          <p class="small center" style="font-size:1.4em; color:white; margin:0.5rem 0"><b>${npcHandShown}</b></p>
+          <p class="small center muted">${g.npcHidden ? 'Сумма скрыта' : 'Сумма: ' + npcTotal}</p>
+        </div>
+      </div>
+      <hr>
+      <p class="small center gold">Ставка: $${Utils.fmtMoney(g.bet)}</p>
+      <hr>
+      <div class="row" style="justify-content:center">
+        ${Components.button('Взять карту', 'Actions.blackjackHit()', { primary: true })}
+        ${Components.button('Хватит', 'Actions.blackjackStand()')}
+      </div>
+      <hr>
+      <div class="row" style="justify-content:center">
+        ${Components.button('← Уйти из-за стола', 'Actions.blackjackLeave()', { danger: true })}
+      </div>
+    `;
+  },
+
+  casino() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    if (!State.player.casinoSession || !State.player.casinoSession.inside) {
+      const fee = CasinoData.ENTRY_FEE;
+      const canEnter = (State.player.money || 0) >= fee;
+      return `
+        <h2>Казино «Фортуна»</h2>
+        <p class="muted">Двери обиты красным бархатом. Изнутри — дым и звон монет.</p>
+        <hr>
+        <p class="small">Вход: <b>$${fee}</b></p>
+        <p class="small muted">Внутри — блэкджек, дорогой алкоголь, сигары, женщины и люди, у которых слишком много денег.</p>
+        <hr>
+        <div class="row">
+          ${canEnter
+            ? Components.button('Войти ($' + fee + ')', 'Actions.casinoEnter()', { primary: true })
+            : '<span class="small red">Не хватает денег на вход.</span>'}
+          ${Components.button('← В город', 'Actions.go("city")')}
+        </div>
+      `;
+    }
+
+    // Внутри
+    const sess = State.player.casinoSession;
+    const npcs = sess.npcs || [];
+
+    return `
+      <h2>Казино «Фортуна»</h2>
+      <p class="muted">Люстры, дым, тихие разговоры. За столами — люди.</p>
+      <hr>
+      <h3>Кто здесь</h3>
+      ${npcs.map(n => `
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><b>${n.name}</b></div>
+            <div class="small muted">${n.hint || ''}</div>
+          </div>
+          <p class="small muted">${n.desc}</p>
+          <div class="row tight">
+            ${Components.button(n.action1, `Actions.casinoTalk('${n.id}')`)}
+            ${n.type === 'prostitute'
+              ? Components.button(n.action2, `Actions.casinoProstitute('${n.id}')`, { danger: true })
+              : Components.button('Сыграть в 21', `Actions.casinoBlackjack('${n.id}')`, { primary: true })}
+          </div>
+        </div>
+      `).join('')}
+
+      <hr>
+      <h3>Выпить</h3>
+      ${CasinoData.drinks.map(d => `
+        <div class="row" style="justify-content:space-between; margin-bottom:0.4rem">
+          <div class="small">${d.name}</div>
+          <div class="row tight">
+            <span class="small gold">$${d.price}</span>
+            ${Components.button('Заказать', `Actions.casinoDrink('${d.id}')`)}
+          </div>
+        </div>
+      `).join('')}
+
+      <h3>Закурить</h3>
+      ${CasinoData.cigars.map(c => `
+        <div class="row" style="justify-content:space-between; margin-bottom:0.4rem">
+          <div class="small">${c.name}</div>
+          <div class="row tight">
+            <span class="small gold">$${c.price}</span>
+            ${Components.button('Закурить', `Actions.casinoSmoke('${c.id}')`)}
+          </div>
+        </div>
+      `).join('')}
+
+      <hr>
+      <div class="row">
+        ${Components.button('← Выйти из казино', 'Actions.casinoLeave()', { danger: true })}
+      </div>
+    `;
+  },
+
+  restaurant() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const today = State.player.restaurantToday || 0;
+    const max = 2;
+    const canEat = today < max;
+
+    return `
+      <h2>Ресторан «Золотой гусь»</h2>
+      <p class="muted">Скатерти, свечи, дорогая посуда. Здесь едят те, кто может себе позволить.</p>
+      <p class="small muted">Сегодня: ${today}/${max}</p>
+      <hr>
+      <h3>Поесть одному</h3>
+      ${RestaurantData.dishes.map(d => `
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><b>${d.name}</b></div>
+            <div class="small gold">$${d.price}</div>
+          </div>
+          <p class="small muted">Голод: +${d.hunger} · Стресс: ${d.stress > 0 ? '+' : ''}${d.stress} · Энергия: +${d.energy}</p>
+          ${canEat ? Components.button('Заказать', `Actions.restaurantEat('${d.id}')`, { primary: true }) : ''}
+        </div>
+      `).join('')}
+      <hr>
+      <h3>Ужин с женщиной</h3>
+      ${['lily', 'evelyn', 'vivian'].map(girlId => {
+        const girl = (typeof WomenData !== 'undefined' && WomenData.getGirl) ? WomenData.getGirl(girlId) : null;
+        if (!girl) return '';
+        const aff = (State.player.womenAffection && State.player.womenAffection[girlId]) || 0;
+        const rel = (State.player.relationship && State.player.relationship[girlId]) || null;
+        const canDate = aff >= 30 && rel !== 'ex' && canEat;
+        return `
+          <div class="card">
+            <div class="row" style="justify-content:space-between">
+              <div><b>${girl.name}</b></div>
+              <div class="small muted">Симпатия: ${aff}/100${rel === 'lover' ? ' · <span class="gold">Пара</span>' : rel === 'ex' ? ' · <span class="red">В ссоре</span>' : ''}</div>
+            </div>
+            ${canDate ? `
+              <div class="row tight">
+                ${Components.button('Стейк ($300)', `Actions.restaurantDate('${girlId}', 'date_steak')`, { primary: true })}
+                ${Components.button('Романтика ($500)', `Actions.restaurantDate('${girlId}', 'date_romantic')`)}
+              </div>
+            ` : `<p class="small muted">${aff < 30 ? 'Слишком мало симпатии (нужно 30+).' : rel === 'ex' ? 'Она в ссоре. Сначала помирись.' : 'Лимит на сегодня.'}</p>`}
+          </div>
+        `;
+      }).join('')}
+      <hr>
+      ${Components.button('← В город', 'Actions.go("city")')}
+    `;
+  },
+
+  restaurantEvent(params) {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const eventId = params && params.eventId;
+    const ev = (typeof RestaurantData !== 'undefined') ? RestaurantData.events.find(e => e.id === eventId) : null;
+    if (!ev) return Engine.go('restaurant');
+    return `
+      <h2>${ev.title}</h2>
+      <p class="muted">${ev.desc}</p>
+      <hr>
+      <h3>Что делать?</h3>
+      ${ev.choices.map((c, i) => `
+        <div class="row" style="margin-bottom:0.5rem">
+          ${Components.button(c.text, `Actions.restaurantEventChoice('${ev.id}', ${i})`, { primary: true })}
+        </div>
+      `).join('')}
+    `;
+  },
+
+  personalEnemies() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const active = (typeof PersonalEnemies !== 'undefined') ? PersonalEnemies.getActive() : [];
+    const waiting = (typeof PersonalEnemies !== 'undefined') ? PersonalEnemies.getWaiting() : [];
+    return `
+      <h2>Личные враги</h2>
+      <p class="muted">Те, кто помнит твоё лицо. И хочет вернуть долг.</p>
+      <hr>
+      <h3>Активные (${active.length})</h3>
+      ${active.length === 0 ? '<p class="small muted">Пока никто не пришёл.</p>' :
+        active.map(e => `
+          <div class="card hot">
+            <div class="row" style="justify-content:space-between">
+              <div><b>${e.name}</b></div>
+              <div class="small red">⚠ ЖДЁТ</div>
+            </div>
+            <p class="small muted">${e.desc}</p>
+            <p class="small">Причина: ${e.reason}</p>
+            <div class="row tight">
+              ${Components.button('Разобраться', `Actions.go("personalEnemyEvent", { enemyId: '${e.id}' })`, { primary: true })}
+            </div>
+          </div>
+        `).join('')}
+      <hr>
+      <h3>В пути (${waiting.length})</h3>
+      ${waiting.length === 0 ? '<p class="small muted">Никто тебя не ищет. Пока.</p>' :
+        waiting.map(e => `
+          <div class="card">
+            <div class="row" style="justify-content:space-between">
+              <div><b>${e.name}</b></div>
+              <div class="small muted">${Math.max(0, e.deadlineDay - State.time.day)} дн.</div>
+            </div>
+            <p class="small muted">${e.reason}</p>
+          </div>
+        `).join('')}
+      <hr>
+      ${Components.button('← В город', 'Actions.go("city")')}
+    `;
+  },
+
+  personalEnemyEvent(params) {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const enemyId = params && params.enemyId;
+    const enemy = (State.player.personalEnemies || []).find(e => e.id === enemyId);
+    if (!enemy) return Engine.go('city');
+    const actions = PersonalEnemiesData.actions;
+    return `
+      <h2 style="color:#a32626">${enemy.name}</h2>
+      <p class="muted" style="font-style:italic">${Utils.pick(enemy.dialog || ['«...»'])}</p>
+      <hr>
+      <p class="small">${enemy.desc}</p>
+      <p class="small muted">Причина: ${enemy.reason}</p>
+      <p class="small">Опасность: ${'★'.repeat(Math.min(5, enemy.power || 1))}</p>
+      <hr>
+      <h3>Что делать?</h3>
+      <div class="row">
+        ${Components.button('Заплатить', `Actions.personalEnemyAction('${enemy.id}', 'pay')`, { primary: true })}
+        ${Components.button('Убить', `Actions.personalEnemyAction('${enemy.id}', 'fight')`, { danger: true })}
+        ${Components.button('Сбежать', `Actions.personalEnemyAction('${enemy.id}', 'flee')`)}
+        ${(State.player.reputation || 0) >= 50 ? Components.button('Поговорить', `Actions.personalEnemyAction('${enemy.id}', 'talk')`) : ''}
+      </div>
+      <hr>
+      ${Components.button('← В город', 'Actions.go("city")')}
     `;
   },
 
@@ -1559,6 +1868,28 @@ const Actions = {
   },
   go(screen, params) { Engine.go(screen, params); },
   workJob(id) { if (typeof WorkSystem !== 'undefined') WorkSystem.apply(id); },
+  casinoEnter() { if (typeof CasinoSystem !== 'undefined') CasinoSystem.enter(); },
+  casinoLeave() { if (typeof CasinoSystem !== 'undefined') CasinoSystem.leave(); },
+  casinoTalk(id) { if (typeof CasinoSystem !== 'undefined') CasinoSystem.talkToNpc(id); },
+  casinoDrink(id) { if (typeof CasinoSystem !== 'undefined') CasinoSystem.drink(id); },
+  casinoSmoke(id) { if (typeof CasinoSystem !== 'undefined') CasinoSystem.smoke(id); },
+  casinoProstitute(id) { if (typeof CasinoSystem !== 'undefined') CasinoSystem.buyProstitute(id); },
+  casinoBlackjack(id) { Engine.go('blackjackSelect', { npcId: id }); },
+  blackjackStart(id, bet) { if (typeof CasinoSystem !== 'undefined') CasinoSystem.startBlackjack(id, bet); },
+  blackjackHit() { if (typeof CasinoSystem !== 'undefined') CasinoSystem.blackjackHit(); },
+  blackjackStand() { if (typeof CasinoSystem !== 'undefined') CasinoSystem.blackjackStand(); },
+  blackjackLeave() { if (typeof CasinoSystem !== 'undefined') CasinoSystem.blackjackLeave(); },
+  blackjackAgain() {
+    if (!State.player || !State.player.blackjack) return;
+    const g = State.player.blackjack;
+    const npcId = g.npc.id;
+    const bet = g.bet;
+    State.player.blackjack = null;
+    if (typeof CasinoSystem !== 'undefined') CasinoSystem.startBlackjack(npcId, bet);
+  },
+  restaurantEat(dishId) { if (typeof RestaurantSystem !== 'undefined') RestaurantSystem.eat(dishId); },
+  restaurantDate(girlId, dishId) { if (typeof RestaurantSystem !== 'undefined') RestaurantSystem.eatWithGirl(girlId, dishId); },
+  restaurantEventChoice(eventId, index) { if (typeof RestaurantSystem !== 'undefined') RestaurantSystem.resolveEvent(eventId, index); },
   newGame() { Engine.go('create'); },
 
   pickSide(side) {

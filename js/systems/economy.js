@@ -95,7 +95,7 @@ const Economy = {
     else Engine.log('Доход нулевой. Пора что-то с этим делать.', 'info');
 
     // Налог зависит от мэра и лобби
-    let tax = 100 + Math.round(income * 0.1);
+    let tax = 200 + Math.round(income * 0.15);
     if (typeof Politics !== 'undefined') {
       const taxMod = Politics.getTaxModifier();
       tax = Math.round(tax * taxMod);

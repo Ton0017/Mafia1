@@ -37,6 +37,7 @@ const CiviliansSystem = {
         this.startCombat(civ, 'rob');
       } else {
         Economy.earn(civ.wealth, 'Ограбление: ' + civ.name);
+        if (typeof PersonalEnemies !== 'undefined' && PersonalEnemies.onRob) PersonalEnemies.onRob(civ.name, civ.wealth);
         Economy.changeHeat(3, 'Свидетель ограбления');
         State.player.sanity.sanity = Math.max(0, State.player.sanity.sanity - 2);
         Engine.log('Ты вытаскиваешь у него $' + civ.wealth + '. Он даже не сопротивлялся.', 'good');
@@ -48,6 +49,7 @@ const CiviliansSystem = {
     } else if (action === 'civ_kill') {
       const heatCost = Utils.rnd(20, 30);
       Economy.earn(civ.wealth, 'Убийство: ' + civ.name);
+      if (typeof PersonalEnemies !== 'undefined' && PersonalEnemies.onKill) PersonalEnemies.onKill(civ.name, State.player.level);
       Economy.changeHeat(heatCost, 'Труп на улице');
       Economy.changeRep(-3, 'Жестокость');
       State.player.sanity.sanity = Math.max(0, State.player.sanity.sanity - 10);

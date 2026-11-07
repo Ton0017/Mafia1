@@ -67,7 +67,22 @@ jobs:
 
         sed -i 's|</widget>|  <platform name="android">\n    <icon background="resources/android/icon-background.png" density="mdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="hdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxhdpi" foreground="resources/android/icon-foreground.png" />\n    <icon background="resources/android/icon-background.png" density="xxxhdpi" foreground="resources/android/icon-foreground.png" />\n    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/splash.png" />\n    <preference name="AndroidWindowSplashScreenBackground" value="#0a0a0a" />\n  </platform>\n  <preference name="MediaPlaybackRequiresUserGesture" value="false" />\n</widget>|' config.xml
 
-        printf '%s\n' '<!DOCTYPE html>' '<html>' '<head>' '<meta charset="utf-8">' '<meta http-equiv="Content-Security-Policy" content="default-src * '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"'; script-src * '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"'; connect-src * '"'"'unsafe-inline'"'"'; img-src * data: blob: '"'"'unsafe-inline'"'"'; frame-src *; style-src * '"'"'unsafe-inline'"'"';">' '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">' '<title>City of Noir</title>' '<style>html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a0a0a; } iframe { border: none; width: 100%; height: 100%; }</style>' '</head>' '<body><iframe id="game-frame" src="https://ton0017.github.io/Mafia1/" allowfullscreen></iframe></body>' '</html>' > www/index.html
+        # ═══ ВСЯ ИГРА ВНУТРИ APK (без iframe) ═══
+        rm -rf www/*
+        cp ../index.html www/index.html
+        cp -r ../js www/
+        cp -r ../css www/
+        cp -r ../assets www/
+        find www -name "*.bak*" -delete
+        find www -maxdepth 2 -name "js_backup_*" -type d -exec rm -rf {} + 2>/dev/null || true
+        sed -i 's/?v=[a-z0-9_]*//g' www/index.html
+        sed -i '/Content-Security-Policy/d' www/index.html
+        sed -i '/rel="manifest"/d' www/index.html
+        sed -i '/serviceWorker/d' www/index.html
+        echo "=== Размер www ==="
+        du -sh www/
+        echo "=== Файлы ==="
+        ls www/
 
         cd platforms/android/app
         keytool -genkey -v -keystore release.keystore -alias noir -keyalg RSA -keysize 2048 -validity 10000 -storepass noirpassword -keypass noirpassword -dname "CN=City of Noir, O=Indie, C=RU" || true

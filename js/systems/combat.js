@@ -656,6 +656,7 @@ const Combat = {
     const rep = 2 + Math.floor(c.enemy.level / 2);
 
     State.player.lifetime.kills++;
+    if (typeof PersonalEnemies !== 'undefined' && PersonalEnemies.onKill) PersonalEnemies.onKill(c.enemy.name, c.enemy.level);
     State.player.survival.combatFatigue = (State.player.survival.combatFatigue || 0) + 1;
     if (State.player.survival.combatFatigue === 3) {
       Engine.log('Руки дрожат. Слишком много стрельбы за сегодня. Нужен отдых.', 'warn');
