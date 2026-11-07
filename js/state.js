@@ -99,6 +99,8 @@ function defaultState() {
       relationship: { lily: null, evelyn: null, vivian: null },
       currentWeaponId: null,
       armor: 'armor_none',
+      currentOutfit: 'outfit_drifter',
+      ownedOutfits: ['outfit_drifter'],
       inventory: {
         ammo: {},
         food: 1,        // NEW: еда

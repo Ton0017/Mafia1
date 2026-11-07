@@ -207,6 +207,11 @@ const Combat = {
     return total;
   },
 
+  _getSpecialBonus(weaponId) {
+    if (!State.weapons || !State.weapons.specialBonuses) return null;
+    return State.weapons.specialBonuses[weaponId] || null;
+  },
+
   _getEnemyPenalty() {
     const c = State.combat;
     if (!c.enemy.debuff) return { accuracy: 0, agility: 0 };
@@ -299,7 +304,9 @@ const Combat = {
       case 'intimidate': {
         if (!State.player || !State.player.stats) return { ok: false };
         const drugBonus = (typeof Drugs !== 'undefined') ? Drugs.getActiveBonuses() : { charisma: 0 };
-        const effectiveCharisma = (State.player.stats.charisma || 0) + (drugBonus.charisma || 0);
+        const outfit = (typeof OutfitsSystem !== 'undefined' && OutfitsSystem.getCurrent) ? OutfitsSystem.getCurrent() : null;
+        const outfitBonus = outfit ? (outfit.charisma || 0) : 0;
+        const effectiveCharisma = (State.player.stats.charisma || 0) + (drugBonus.charisma || 0) + outfitBonus;
         const enemyWill = (c.enemy && c.enemy.stats && c.enemy.stats.willpower) || 1;
         let chance = (effectiveCharisma - enemyWill) / 20 + 0.3;
         if (typeof Perks !== 'undefined') {
@@ -423,6 +430,10 @@ const Combat = {
     const bodyMult = Weapons.bodyMultByCategory[weapon.category] || {};
 
     let hit = weapon.accuracy + attacker.stats.shooting / 20 + (attacker.aimBonus || 0);
+    if (isPlayer) {
+      const sb = this._getSpecialBonus(c.playerState.weaponId);
+      if (sb === 'accuracy') hit += 0.10;
+    }
     if (c.distance > weapon.range) hit -= Math.min(0.4, (c.distance - weapon.range) * 0.05);
     hit -= defender.coverBonus || 0;
     if (attacker.body.leftArm.hp <= 0 || attacker.body.rightArm.hp <= 0) hit -= 0.4;
@@ -468,6 +479,10 @@ const Combat = {
     if (Utils.chance(hit)) {
       if (typeof Sfx !== 'undefined') Sfx.play('hit');
       let dmg = Math.round(weapon.damage * (bodyMult[target] || 1));
+      if (isPlayer) {
+        const sbDmg = this._getSpecialBonus(c.playerState.weaponId);
+        if (sbDmg === 'damage') dmg = Math.round(dmg * 1.15);
+      }
 
       if (isPlayer && typeof Perks !== 'undefined') {
         const mods = Perks.getModifiers();
@@ -667,7 +682,13 @@ const Combat = {
     Economy.addXp(xp);
     Economy.earn(money, 'добыча с врага');
     Economy.changeRep(rep, 'уважение выросло');
-    Economy.changeHeat(3);
+    const sbHeat = this._getSpecialBonus(c.playerState && c.playerState.weaponId);
+    if (sbHeat === 'silencer') {
+      Economy.changeHeat(1);
+      this._log('Тихий выстрел. Меньше шума — меньше копов.', 'info');
+    } else {
+      Economy.changeHeat(3);
+    }
 
     if (c.enemy.loot.weaponId && !State.weapons.owned.includes(c.enemy.loot.weaponId)) {
       State.weapons.owned.push(c.enemy.loot.weaponId);

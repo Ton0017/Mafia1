@@ -161,6 +161,7 @@ const Screens = {
         ${Components.button('Казино', 'Actions.go("casino")')}
         ${Components.button('Ресторан', 'Actions.go("restaurant")')}
         ${Components.button('Аптека', 'Actions.go("apothecary")')}
+        ${Components.button('Бутики', 'Actions.go("outfits")')}
         ${Components.button('Дилер', 'Actions.go("dealer")')}
         ${((State.player.personalEnemies || []).filter(e => e.status === 'appeared').length > 0)
           ? Components.button('⚠ Враги (' + (State.player.personalEnemies || []).filter(e => e.status === 'appeared').length + ')', 'Actions.go("personalEnemies")', { danger: true })
@@ -169,6 +170,9 @@ const Screens = {
       </div>
       <hr>
       <div class="row">
+        ${(typeof NightData !== 'undefined' && NightData.isNight())
+          ? Components.button('Ночной город', 'Actions.go("nightCity")', { danger: true })
+          : ''}
         ${Components.button('Спать', 'Actions.sleep()', { primary: true })}
         ${Components.button('Сохранить в меню', 'Actions.saveAndMenu()')}
       </div>
@@ -476,6 +480,230 @@ const Screens = {
       </div>
       <hr>
       ${Components.button('← В город', 'Actions.go("city")')}
+    `;
+  },
+
+  outfits() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const owned = State.player.ownedOutfits || [];
+    const current = (typeof OutfitsSystem !== 'undefined') ? OutfitsSystem.getCurrent() : null;
+    return `
+      <h2>Бутики</h2>
+      <p class="muted">В этом городе тебя встречают по костюму. И провожают тоже по нему.</p>
+      <p class="small">Сейчас на тебе: <b>${current ? current.name : 'ничего'}</b>${current ? ' (харизма +' + current.charisma + ')' : ''}</p>
+      <p class="small muted">Куплено нарядов: ${owned.length}</p>
+      <hr>
+      ${OutfitsData.boutiques.map(b => `
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><b>${b.name}</b></div>
+            <div class="small muted">${b.items.length} моделей</div>
+          </div>
+          <p class="small muted">${b.desc}</p>
+          ${Components.button('Зайти', `Actions.go("outfitBoutique", { boutiqueId: '${b.id}' })`, { primary: true })}
+        </div>
+      `).join('')}
+      <hr>
+      ${Components.button('← В город', 'Actions.go("city")')}
+    `;
+  },
+
+  outfitBoutique(params) {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const boutiqueId = params && params.boutiqueId;
+    const b = (typeof OutfitsData !== 'undefined') ? OutfitsData.boutiques.find(x => x.id === boutiqueId) : null;
+    if (!b) return Engine.go('outfits');
+    const owned = State.player.ownedOutfits || [];
+    const current = State.player.currentOutfit;
+    return `
+      <h2>${b.name}</h2>
+      <p class="muted">${b.desc}</p>
+      <hr>
+      ${b.items.map(item => {
+        const has = owned.includes(item.id);
+        const worn = current === item.id;
+        return `
+          <div class="card ${worn ? 'hot' : ''}">
+            <div class="row" style="justify-content:space-between">
+              <div><b>${item.name}</b></div>
+              <div class="small gold">$${item.price}</div>
+            </div>
+            <p class="small muted">${item.desc}</p>
+            <p class="small">Харизма: +${item.charisma} · Репутация: +${item.rep}</p>
+            <div class="row tight">
+              ${worn ? '<span class="tag owner">Надето</span>' :
+                has ? Components.button('Надеть', `Actions.wearOutfit('${item.id}')`, { primary: true }) :
+                Components.button('Купить', `Actions.buyOutfit('${item.id}')`)}
+            </div>
+          </div>
+        `;
+      }).join('')}
+      <hr>
+      ${Components.button('← Назад', 'Actions.go("outfits")')}
+    `;
+  },
+
+  nightCity() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    if (!NightData.isNight()) {
+      return `
+        <h2>Ночной город</h2>
+        <p class="muted">Сейчас не ночь. Двери закроются до утра.</p>
+        <p class="small muted">Ночная жизнь открывается после 22:00 и закрывается в 6:00.</p>
+        <hr>
+        ${Components.button('← В город', 'Actions.go("city")')}
+      `;
+    }
+    const locs = NightData.locations;
+    return `
+      <h2>Ночной город</h2>
+      <p class="muted">То, что днём скрыто, ночью выходит на улицы.</p>
+      <p class="small muted">Время: ${State.time.hour}:00. Скоро рассвет.</p>
+      <hr>
+      ${locs.map(loc => `
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><b>${loc.name}</b></div>
+            <div class="small gold">${loc.entry > 0 ? '$${loc.entry}' : 'бесплатно'}</div>
+          </div>
+          <p class="small muted">${loc.desc}</p>
+          ${Components.button('Войти', `Actions.nightEnter('${loc.id}')`, { primary: true })}
+        </div>
+      `).join('')}
+      <hr>
+      ${Components.button('← В город', 'Actions.go("city")')}
+    `;
+  },
+
+  stripclub() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const sc = NightData.stripClub;
+    return `
+      <h2>Розовая жемчужина</h2>
+      <p class="muted">Бархат, шампанское и женщины, которые умеют слушать. И брать деньги.</p>
+      <hr>
+      <h3>Шоу</h3>
+      ${sc.dances.map(d => `
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><b>${d.name}</b></div>
+            <div class="small gold">$${d.price}</div>
+          </div>
+          <div class="row tight" style="margin-top:0.4rem">
+            ${Components.button('Заказать', `Actions.nightDance('${d.id}')`, { primary: true })}
+          </div>
+        </div>
+      `).join('')}
+      <hr>
+      <h3>Выпить</h3>
+      ${sc.drinks.map(d => `
+        <div class="row" style="justify-content:space-between; margin-bottom:0.4rem">
+          <div class="small">${d.name}</div>
+          <div class="row tight">
+            <span class="small gold">$${d.price}</span>
+            ${Components.button('Заказать', `Actions.nightDrink('${d.id}')`)}
+          </div>
+        </div>
+      `).join('')}
+      <hr>
+      <h3>Официантки</h3>
+      <p class="small muted">Они знают всё. За деньги.</p>
+      ${Components.button('Поговорить с официанткой ($200)', 'Actions.nightWaitress()', { primary: true })}
+      <hr>
+      ${Components.button('← В ночной город', 'Actions.go("nightCity")')}
+    `;
+  },
+
+  den() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const den = NightData.den;
+    return `
+      <h2>Крысиная нора</h2>
+      <p class="muted">Подвал без окон. Пахнет химией и страхом. Здесь не задают вопросов.</p>
+      <hr>
+      <h3>Купить дозу</h3>
+      ${den.drugs.map(d => `
+        <div class="row" style="justify-content:space-between; margin-bottom:0.4rem">
+          <div class="small">${d.name}</div>
+          <div class="row tight">
+            <span class="small gold">$${d.price}</span>
+            ${Components.button('Взять', `Actions.nightDrug('${d.id}')`, { primary: true })}
+          </div>
+        </div>
+      `).join('')}
+      <hr>
+      <h3>Осмотреться</h3>
+      <p class="small muted">Кто-то сидит у стены. Кто-то в тени. Кто-то не человек.</p>
+      ${Components.button('Осмотреться', 'Actions.nightDenEncounter()', { primary: true })}
+      <hr>
+      ${Components.button('← В ночной город', 'Actions.go("nightCity")')}
+    `;
+  },
+
+  market() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const m = NightData.market;
+    const owned = (State.weapons && State.weapons.owned) || [];
+    return `
+      <h2>Чёрный рынок</h2>
+      <p class="muted">Подземный склад. Всё, что нельзя купить днём. За наличные, без чеков.</p>
+      <hr>
+      <h3>Именное оружие</h3>
+      ${m.weapons.map(w => {
+        const has = owned.includes(w.baseId);
+        return `
+          <div class="card ${has ? 'hot' : ''}">
+            <div class="row" style="justify-content:space-between">
+              <div><b>${w.name}</b></div>
+              <div class="small gold">$${w.price}</div>
+            </div>
+            <p class="small muted">${w.desc}</p>
+            ${has
+              ? '<span class="tag owner">Уже есть</span>'
+              : Components.button('Купить', `Actions.nightBuyWeapon('${w.id}')`, { primary: true })}
+          </div>
+        `;
+      }).join('')}
+      <hr>
+      <h3>Спецтовары</h3>
+      ${m.specials.map(sp => `
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><b>${sp.name}</b></div>
+            <div class="small gold">$${sp.price}</div>
+          </div>
+          <p class="small muted">${sp.desc}</p>
+          ${Components.button('Купить', `Actions.nightBuySpecial('${sp.id}')`)}
+        </div>
+      `).join('')}
+      <hr>
+      ${Components.button('← В ночной город', 'Actions.go("nightCity")')}
+    `;
+  },
+
+  arena() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const a = NightData.arena;
+    return `
+      <h2>Яма</h2>
+      <p class="muted">Клетка под землёй. Кровь, ставки, крики. Здесь не выживают — здесь побеждают.</p>
+      <hr>
+      <p class="small">Твой уровень: <b>${State.player.level || 1}</b>. Ставка — только твоя жизнь.</p>
+      <hr>
+      <h3>Выбери противника</h3>
+      ${a.fights.map(f => `
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><b>${f.name}</b></div>
+            <div class="small gold">Приз: $${f.prize}</div>
+          </div>
+          <p class="small muted">${f.desc}</p>
+          <p class="small">Сложность: ${'|'.repeat(f.difficulty)}${'.'.repeat(5 - f.difficulty)}</p>
+          ${Components.button('Выйти в клетку', `Actions.nightArenaFight('${f.id}')`, { primary: true, danger: true })}
+        </div>
+      `).join('')}
+      <hr>
+      ${Components.button('← В ночной город', 'Actions.go("nightCity")')}
     `;
   },
 
@@ -1868,6 +2096,17 @@ const Actions = {
   },
   go(screen, params) { Engine.go(screen, params); },
   workJob(id) { if (typeof WorkSystem !== 'undefined') WorkSystem.apply(id); },
+  buyOutfit(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.buy(id); },
+  wearOutfit(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.wear(id); },
+  nightEnter(id) { if (typeof NightSystem !== 'undefined') NightSystem.enter(id); },
+  nightDrink(id) { if (typeof NightSystem !== 'undefined') NightSystem.drinkNight(id); },
+  nightDance(id) { if (typeof NightSystem !== 'undefined') NightSystem.dance(id); },
+  nightWaitress() { if (typeof NightSystem !== 'undefined') NightSystem.talkWaitress(); },
+  nightDrug(id) { if (typeof NightSystem !== 'undefined') NightSystem.buyDenDrug(id); },
+  nightDenEncounter() { if (typeof NightSystem !== 'undefined') NightSystem.denEncounter(); },
+  nightBuyWeapon(id) { if (typeof NightSystem !== 'undefined') NightSystem.buyMarketWeapon(id); },
+  nightBuySpecial(id) { if (typeof NightSystem !== 'undefined') NightSystem.buyMarketSpecial(id); },
+  nightArenaFight(id) { if (typeof NightSystem !== 'undefined') NightSystem.arenaFight(id); },
   casinoEnter() { if (typeof CasinoSystem !== 'undefined') CasinoSystem.enter(); },
   casinoLeave() { if (typeof CasinoSystem !== 'undefined') CasinoSystem.leave(); },
   casinoTalk(id) { if (typeof CasinoSystem !== 'undefined') CasinoSystem.talkToNpc(id); },
