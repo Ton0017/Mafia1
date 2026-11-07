@@ -129,6 +129,9 @@ const Time = {
     State.player.lifetime.daysSurvived++;
     State.player.sanity.killsToday = 0;
     State.player.barVisitsToday = 0;
+    State.player.workToday = 0;
+    State.player.casinoToday = 0;
+    State.player.restaurantToday = 0;
     State.player.pokerGamesToday = 0;
     State.player.zoneVisitsToday = 0;
     State.player.idleEventsToday = 0;

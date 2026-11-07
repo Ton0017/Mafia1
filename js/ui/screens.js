@@ -157,6 +157,7 @@ const Screens = {
         ${Components.button('Штаб', 'Actions.go("building")')}
         ${Components.button('Автосалоны', 'Actions.go("carsShowrooms")')}
         ${Components.button('Бар', 'Actions.go("bar")')}
+        ${Components.button('Работа', 'Actions.go("work")')}
         ${Components.button('Аптека', 'Actions.go("apothecary")')}
         ${Components.button('Дилер', 'Actions.go("dealer")')}
         ${Components.button('Игрок', 'Actions.go("player")')}
@@ -166,6 +167,32 @@ const Screens = {
         ${Components.button('Спать', 'Actions.sleep()', { primary: true })}
         ${Components.button('Сохранить в меню', 'Actions.saveAndMenu()')}
       </div>
+    `;
+  },
+
+  work() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const canWork = (typeof WorkSystem !== 'undefined') ? WorkSystem.canWork() : false;
+    const today = State.player.workToday || 0;
+    const max = (typeof WorkSystem !== 'undefined') ? WorkSystem.MAX_PER_DAY : 2;
+    return `
+      <h2>Работа</h2>
+      <p class="muted">Легальный заработок. Без риска. Без крови. Почти.</p>
+      <p class="small muted">Сегодня: ${today}/${max}. ${canWork ? '' : 'Организм просит отдыха.'}</p>
+      <hr>
+      ${WorkData.map(job => `
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><b>${job.name}</b></div>
+            <div class="small gold">$${job.pay}</div>
+          </div>
+          <p class="small muted">${job.desc}</p>
+          <p class="small">Время: ${job.hours}ч · Энергия: −${job.energyCost}</p>
+          ${canWork ? Components.button('Взяться ($' + job.pay + ')', `Actions.workJob('${job.id}')`, { primary: true }) : ''}
+        </div>
+      `).join('')}
+      <hr>
+      ${Components.button('← В город', 'Actions.go("city")')}
     `;
   },
 
@@ -1531,6 +1558,7 @@ const Actions = {
     if (typeof ZoneSystem !== 'undefined') ZoneSystem.resolve(sceneId, choiceIndex); 
   },
   go(screen, params) { Engine.go(screen, params); },
+  workJob(id) { if (typeof WorkSystem !== 'undefined') WorkSystem.apply(id); },
   newGame() { Engine.go('create'); },
 
   pickSide(side) {

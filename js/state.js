@@ -84,6 +84,9 @@ function defaultState() {
       sanity: defaultSanity(),           // NEW
       dependencies: defaultDependencies(),
       barVisitsToday: 0,
+      workToday: 0,
+      casinoToday: 0,
+      restaurantToday: 0,
       pokerGamesToday: 0,
       idleHistory: [],
       idleEventsToday: 0,
