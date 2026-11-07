@@ -73,6 +73,30 @@ const BarSystem = {
         State.quests.available.push({ id: 'q_rumor_' + Utils.uid(), type: 'social', title: 'Слух из бара', desc: 'Информация, которую ты купил.', zoneId: rumorZone.id, zoneName: rumorZone.name, giverName: 'Женщина в красном', duration: 2, risk: 0.2, reward: { money: 400, xp: 50, rep: 5 }, daily: false, createdDay: State.time.day });
       }
     } else if (choice.action === 'heal_sanity') { Economy.spend(choice.value, 'Ночь с женщиной'); Sanity.onSex(); }
+    else if (choice.action === 'heal_hp') {
+      if (!State.player || !State.player.body) return;
+      if (!State.player.inventory) State.player.inventory = {};
+      const cost = choice.value || 0;
+      const heal = choice.healAmount || 25;
+      if ((State.player.money || 0) < cost) { Engine.log('Не хватает денег на лечение.', 'warn'); return; }
+      if (!Economy.spend(cost, 'Лечение у Доктора Сэма')) return;
+      // Лечим самую раненую часть тела
+      const parts = Object.keys(State.player.body).filter(k => {
+        const bp = State.player.body[k];
+        return bp && typeof bp.hp === 'number' && typeof bp.max === 'number' && bp.hp < bp.max;
+      });
+      if (parts.length === 0) {
+        Engine.log('Раны уже зажили. Сэм пожимает плечами.', 'info');
+        return;
+      }
+      parts.sort((a, b) => (State.player.body[a].hp / State.player.body[a].max) - (State.player.body[b].hp / State.player.body[b].max));
+      const part = parts[0];
+      const before = State.player.body[part].hp;
+      State.player.body[part].hp = Math.min(State.player.body[part].max, before + heal);
+      const healed = State.player.body[part].hp - before;
+      Engine.log('Доктор Сэм обработал рану. ' + part + ' +' + healed + ' HP (было ' + before + ', стало ' + State.player.body[part].hp + ').', 'good');
+      logText = choice.log || 'Он раскладывает инструменты. Больно. Но помогает.';
+    }
     else if (choice.action === 'random_loot') {
       if (Utils.chance(0.6)) { Economy.earn(200, 'Лут'); State.weapons.owned.push('pistol_glock'); logText = choice.log_success; }
       else { State.player.body.torso.hp = Math.max(1, State.player.body.torso.hp - 40); State.player.conditions.head.concussion = true; logText = choice.log_fail; }
