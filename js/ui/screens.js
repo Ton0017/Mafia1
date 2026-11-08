@@ -170,6 +170,7 @@ const Screens = {
     if (deps.withdrawal) warnings.push('<span class="red">Ломка: ' + deps.withdrawal.type + '</span>');
 
     return `
+      <div class="city-bg" style="background-image: url('assets/backgrounds/background${(State.time.day % 4) + 1}.jpg')"></div>
       <h2>${State.city.name}</h2>
       <p class="muted">${State.city.weather} · ${State.city.motto}</p>
       ${warnings.length ? `<div class="card hot">${warnings.join(' · ')}</div>` : ''}
@@ -1745,8 +1746,16 @@ const Screens = {
     if (typeof WomenData === 'undefined') return '<p class="red">Данные женщин недоступны.</p>';
     if (!State.player) return '<p class="red">Нет игрока.</p>';
     const girls = WomenData.getAll();
+    
+    let sexSceneHtml = '';
+    if (State.flags && State.flags.showSexScene) {
+      sexSceneHtml = `<img src="assets/sprites/sex_scene.jpg" class="scene-img" alt="Ночь">`;
+      State.flags.showSexScene = false; // Показываем картинку только один раз
+    }
+
     return `
       <h2>Женщины</h2>
+      ${sexSceneHtml}
       <p class="muted">В нуарном городе женщины опаснее пуль.</p>
       <hr>
       ${girls.map(g => {

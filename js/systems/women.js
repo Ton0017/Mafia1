@@ -165,6 +165,8 @@ const WomenSystem = {
       // ПЕРВАЯ НОЧЬ
       Engine.log('— ПЕРВАЯ НОЧЬ С ' + girl.name.toUpperCase() + ' —', 'good');
       Engine.log(girl.romanceText, 'lore');
+      if (!State.flags) State.flags = {};
+      State.flags.showSexScene = true;
       this.markRomanceDone(id);
       State.player.sanity.sanity = 100;
       State.player.sanity.stress = 0;
@@ -191,6 +193,8 @@ const WomenSystem = {
     }
     
     Engine.log('Ты остаешься у ' + girl.name + ' на ночь. Дождь стучит по стеклу, но тебе тепло.', 'good');
+    if (!State.flags) State.flags = {};
+    State.flags.showSexScene = true;
     if (!State.player.sanity) State.player.sanity = { sanity: 100, stress: 0, killsToday: 0, lastResetDay: 0, nightmares: 0 };
     State.player.sanity.stress = Math.max(0, (State.player.sanity.stress || 0) - 50);
     this.increaseAffection(id, 5); // Небольшой плюс за внимание

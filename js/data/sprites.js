@@ -7,6 +7,7 @@ const Sprites = {
     'assets/sprites/man.png5.jpg',
     'assets/sprites/man.png6.jpg',
     'assets/sprites/man.png7.jpg',
+    'assets/sprites/man.png8.jpg',
   ],
   women: [
     'assets/sprites/women.png1.jpg',
