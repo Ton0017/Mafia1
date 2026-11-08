@@ -231,6 +231,7 @@ const Screens = {
         ${Components.button('Все зоны', 'Actions.go("zones")')}
         ${Components.button('Фракции', 'Actions.go("factions")')}
         ${Components.button('Мэрия', 'Actions.go("mayorOffice")')}
+        ${Components.button('Участок', 'Actions.policeEnter()')}
         ${Components.button('Штаб', 'Actions.go("building")')}
         ${Components.button('Автосалоны', 'Actions.go("carsShowrooms")')}
         ${Components.button('Бар', 'Actions.go("bar")')}
@@ -1912,6 +1913,60 @@ const Screens = {
     `;
   },
 
+  policeStation() {
+    if (!State.player) return '<p class="red">Нет игрока.</p>';
+    const heat = State.player.heat || 0;
+    const canSurrender = heat >= 40 && heat < 70;
+    let daysIfSurrender = 3;
+
+    let deskLine;
+    if (heat >= 70) deskLine = 'Дежурный смотрит на тебя как на приз. Он не звонит. Он уже нажал кнопку.';
+    else if (heat >= 40) deskLine = 'Дежурный кивает. Слишком вежливо. Он уже думает, как тебя сдать.';
+    else if (heat >= 20) deskLine = 'Дежурный смотрит на тебя дольше обычного. Но пропускает.';
+    else deskLine = 'Дежурный не поднимает глаз от бумаг. Ты для него — никто. Это хорошо.';
+
+    return `
+      <h2>Полицейский участок</h2>
+      <p class="muted">Скамья, лампа, запах кофе и пота. Никто не спрашивает, зачем ты здесь.</p>
+      <hr>
+      ${Components.card('Дежурный', `
+        <p class="small" style="font-style:italic">${deskLine}</p>
+        <p class="small muted">Твой розыск: <b>${heat}</b></p>
+      `)}
+      <hr>
+      <h3>Действия</h3>
+
+      ${Components.card('Навести справки', `
+        <p class="small muted">Узнать, что у них на тебя есть.</p>
+        <p class="small">Цена: $${PoliceStation.ASK_PRICE} · 1 час</p>
+        ${Components.button('Спросить', 'Actions.policeAsk()')}
+      `)}
+
+      ${Components.card('Подкупить дежурного', `
+        <p class="small muted">Снизить розыск. Может не сработать — зависит от heat.</p>
+        <p class="small">Цена: $${Utils.fmtMoney(500 + heat * 20)} · 30 мин</p>
+        ${heat > 0 ? Components.button('Подкупить', 'Actions.policeBribe()') : '<p class="small muted">Тебе нечего подкупать.</p>'}
+      `)}
+
+      ${Components.card('Посидеть на скамье', `
+        <p class="small muted">Просто посидеть. Никто не спросит, зачем.</p>
+        <p class="small">Бесплатно · 2 часа · Вас запомнят</p>
+        ${Components.button('Сесть', 'Actions.policeSit()')}
+      `)}
+
+      ${canSurrender ? `
+        ${Components.card('Сдаться', `
+          <p class="small muted">Ты на заметке, но ещё не в розыске. Может, успеешь.</p>
+          <p class="small">Срок: ${daysIfSurrender} ${daysIfSurrender === 1 ? 'день' : daysIfSurrender < 5 ? 'дня' : 'дней'}</p>
+          ${Components.button('Сдаться', 'Actions.policeSurrender()', { danger: true })}
+        `)}
+      ` : ''}
+
+      <hr>
+      ${Components.button('← В город', 'Actions.go("city")')}
+    `;
+  },
+
   factions() {
     return `
       <h2>Фракции</h2>
@@ -2268,6 +2323,11 @@ const Actions = {
     if (typeof ZoneSystem !== 'undefined') ZoneSystem.resolve(sceneId, choiceIndex); 
   },
   go(screen, params) { Engine.go(screen, params); },
+  policeEnter() { if (typeof PoliceStation !== 'undefined') PoliceStation.enter(); },
+  policeAsk() { if (typeof PoliceStation !== 'undefined') PoliceStation.ask(); },
+  policeBribe() { if (typeof PoliceStation !== 'undefined') PoliceStation.bribeDesk(); },
+  policeSit() { if (typeof PoliceStation !== 'undefined') PoliceStation.sit(); },
+  policeSurrender() { if (typeof PoliceStation !== 'undefined') PoliceStation.surrender(); },
   deathFinalize() { if (typeof DeathSystem !== 'undefined') DeathSystem.finalize(); },
   jailNext() { if (typeof JailSystem !== 'undefined') JailSystem.next(); },
   jailChoose(i) { if (typeof JailSystem !== 'undefined') JailSystem.choose(i); },
