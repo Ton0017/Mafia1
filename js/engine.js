@@ -46,6 +46,11 @@ const Engine = {
   },
 
   render() {
+    // ГЛОБАЛЬНАЯ ЗАЩИТА: если игрок мертв, рисуем только экран смерти
+    if (typeof State !== 'undefined' && State.deathRecord && this.screen !== 'deathScreen' && this.screen !== 'menu') {
+      this.screen = 'deathScreen';
+      this.params = {};
+    }
     const fn = Screens[this.screen];
     const screenEl = document.getElementById('screen');
     if (!screenEl) return;
