@@ -29,7 +29,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Разблокировка AudioContext на первом клике
   const unlockAudio = () => {
-    if (typeof Music !== 'undefined') { Music.init(); Music.resume && Music.resume(); }
+    if (typeof Music !== 'undefined') {
+      Music.init();
+      Music.resume && Music.resume();
+      
+      // Автовключение: если игрок ранее не выключал музыку (нет 'off' в памяти)
+      let audioPref = null;
+      try { audioPref = localStorage.getItem('noir_audio'); } catch (e) {}
+      if (audioPref !== 'off') {
+        Music.start();
+      }
+    }
     if (typeof Sfx !== 'undefined') { Sfx.init(); Sfx.resume(); }
     document.removeEventListener('touchstart', unlockAudio);
     document.removeEventListener('mousedown', unlockAudio);

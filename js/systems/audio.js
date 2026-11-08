@@ -58,19 +58,29 @@ const Music = {
 
   async _play(url, loop) {
     if (!this.ctx || !this.masterGain) return;
+    
+    // Генерируем уникальный ID для этого запроса
+    this._playId = (this._playId || 0) + 1;
+    const currentId = this._playId;
+
     if (this.currentSource) {
       try { this.currentSource.stop(); } catch (e) {}
       this.currentSource = null;
     }
+    
     const buf = await this._loadBuffer(url);
     if (!buf) return;
-    if (!this.enabled) return; // Защита: если выключили, пока грузилось — не играем
+    
+    // Если музыка выключена, или за время загрузки поступил другой запрос (например, бой закончился) — отменяем
+    if (!this.enabled || this._playId !== currentId) return;
+
     const src = this.ctx.createBufferSource();
     src.buffer = buf;
     src.loop = loop;
     src.connect(this.masterGain);
     src.onended = () => {
       if (!this.enabled || this.inCombat) return;
+      if (this._playId !== currentId) return; // Защита от наложения старого трека
       this.currentBg = (this.currentBg + 1) % this.bgPlaylist.length;
       this._play(this.bgPlaylist[this.currentBg], false);
     };
