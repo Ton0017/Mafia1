@@ -67,7 +67,7 @@ const CasinoSystem = {
       State.player.dependencies.alcohol = Math.min(100, (State.player.dependencies.alcohol || 0) + drink.addiction);
     }
     Time.spend(0.25);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
@@ -85,7 +85,7 @@ const CasinoSystem = {
       State.player.dependencies.nicotine = Math.min(100, (State.player.dependencies.nicotine || 0) + cigar.addiction);
     }
     Time.spend(0.25);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
@@ -103,7 +103,7 @@ const CasinoSystem = {
     if (!State.flags) State.flags = {};
     State.flags.showSexScene = true;
     Time.spend(4, 'Ночь с ' + npc.name);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.go('casino');
   },
@@ -175,7 +175,7 @@ const CasinoSystem = {
     if (!State.player || !State.player.blackjack) return;
     const g = State.player.blackjack;
     if (g.stage !== 'player_turn') return;
-    g.deck = g.deck || Cards.shuffle(Cards.newDeck());
+    if (!g.deck || g.deck.length < 5) g.deck = Cards.shuffle(Cards.newDeck()); // Перемешиваем, если мало карт
     g.playerHand.push(g.deck.pop());
     const total = this._calcHand(g.playerHand);
     Engine.log('Ты берёшь. ' + g.playerHand[g.playerHand.length - 1].r + g.playerHand[g.playerHand.length - 1].s + '. Сумма: ' + total + '.', 'info');
@@ -204,7 +204,7 @@ const CasinoSystem = {
     const cfg = CasinoData.blackjack;
     const thr = cfg.npcThresholds[g.npc.type] || { min: 16, max: 18 };
     const target = Utils.rnd(thr.min, thr.max);
-    g.deck = g.deck || Cards.shuffle(Cards.newDeck());
+    if (!g.deck || g.deck.length < 5) g.deck = Cards.shuffle(Cards.newDeck());
     while (this._calcHand(g.npcHand) < target) {
       g.npcHand.push(g.deck.pop());
     }
@@ -252,6 +252,11 @@ const CasinoSystem = {
     if (State.player.casinoSession) {
       State.player.casinoSession.gamesPlayed = (State.player.casinoSession.gamesPlayed || 0) + 1;
     }
+    
+    // Игра за столом отнимает 30 минут
+    Time.spend(0.5);
+    if (!State.player || !State.city || State.deathRecord) return;
+    
     Save.save();
     Engine.render();
   },
