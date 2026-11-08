@@ -34,7 +34,7 @@ const Survival = {
     // #34: смерть при ЛЮБОЙ критической части
     if (State.player.body.torso.hp <= 0 || State.player.body.head.hp <= 0) {
       Engine.log('Истощение доконало тебя.', 'bad');
-      if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart();
+      if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart('Истощение. Ты слишком долго не ел, не пил или не спал.');
       return;
     }
   },

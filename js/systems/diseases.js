@@ -35,7 +35,7 @@ const Diseases = {
     // 3. Смерть от болезней
     if (p.body && p.body.torso && p.body.torso.hp <= 0) {
       Engine.log('Болезнь доконала тебя. Это была не пуля, а твои привычки.', 'bad');
-      if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart();
+      if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart('Болезнь. Не пуля — твои привычки.');
       return;
     }
   },

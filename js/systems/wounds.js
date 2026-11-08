@@ -57,7 +57,7 @@ const Wounds = {
     // Смерть от травм
     if (player.body.torso && player.body.head && (player.body.torso.hp <= 0 || player.body.head.hp <= 0)) {
       Engine.log('Травмы доконали тебя.', 'bad');
-      if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart();
+      if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart('Раны. Ты не вылечил их вовремя.');
       return;
     }
   },

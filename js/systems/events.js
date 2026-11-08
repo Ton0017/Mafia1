@@ -82,7 +82,7 @@ const EventsSystem = {
     if (eff.log) Engine.log(eff.log, eff.tone || 'info');
 
     if (State.player.body.torso.hp <= 0) {
-      if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart();
+      if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart('Случай. Один из тех, что заканчивают всё.');
       return;
     }
   },

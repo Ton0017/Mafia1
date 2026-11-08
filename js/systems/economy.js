@@ -114,7 +114,7 @@ const Economy = {
         if (State.player.body.torso.hp <= 0) {
           Engine.log('Ты не пережил визит крыши.', 'bad');
           if (typeof DeathSystem !== 'undefined') {
-            DeathSystem.fullRestart();
+            DeathSystem.fullRestart('Крыша. Ты не заплатил — и тебя не стало.');
             return;
           }
         }

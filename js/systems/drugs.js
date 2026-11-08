@@ -51,7 +51,7 @@ const Drugs = {
       State.player.lifetime.overdoses++;
       // Смерть или тяжёлое состояние
       if (Utils.chance(0.7)) {
-        if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart();
+        if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart('Передоз. Доза оказалась больше, чем ты.');
         return true;
       } else {
         if (State.player.body && State.player.body.torso) State.player.body.torso.hp = Math.max(1, (State.player.body.torso.hp || 50) - 50);

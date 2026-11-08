@@ -34,6 +34,37 @@ const Screens = {
     `;
   },
 
+  deathScreen() {
+    const d = State.deathRecord;
+    if (!d) return Engine.go('create');
+    const lt = d.lifetime || {};
+    return `
+      <h2 style="text-align:center; letter-spacing:0.1em;">— КОНЕЦ ПУТИ —</h2>
+      <div class="poker-table" style="margin-top:1rem;">
+        <div class="poker-table-label">Причина</div>
+        <div style="font-size:1.3rem; font-weight:bold; margin:0.5rem 0;">${d.reason}</div>
+      </div>
+      <p class="muted" style="font-style:italic; text-align:center; margin:1rem 0.5rem;">${d.epitaph}</p>
+      <hr>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;"><span class="small muted">Имя</span><span class="small">${d.name}</span></div>
+        <div class="row" style="justify-content:space-between;"><span class="small muted">День</span><span class="small">${d.day}</span></div>
+        <div class="row" style="justify-content:space-between;"><span class="small muted">Уровень</span><span class="small">${d.level}</span></div>
+        <div class="row" style="justify-content:space-between;"><span class="small muted">Убийств</span><span class="small">${lt.kills || 0}</span></div>
+        <div class="row" style="justify-content:space-between;"><span class="small muted">Миссий</span><span class="small">${lt.missionsDone || 0}</span></div>
+        <div class="row" style="justify-content:space-between;"><span class="small muted">Заработано</span><span class="small">$${Utils.fmtMoney(lt.moneyEarned || 0)}</span></div>
+        <div class="row" style="justify-content:space-between;"><span class="small muted">В кармане на момент смерти</span><span class="small">$${Utils.fmtMoney(d.money)}</span></div>
+      </div>
+      ${d.gainedBlood > 0 ? `
+        <hr>
+        <p class="small" style="text-align:center;">Кровь рода: <b>+${d.gainedBlood}</b> (всего ${d.totalBlood})</p>
+        <p class="small muted" style="text-align:center;">Следующая жизнь начнётся с этим наследством. Город помнит.</p>
+      ` : ''}
+      <hr>
+      ${Components.button('Начать сначала', 'Actions.deathFinalize()', { primary: true })}
+    `;
+  },
+
   create() {
     return `
       <h2>Новая жизнь</h2>
@@ -2167,6 +2198,7 @@ const Actions = {
     if (typeof ZoneSystem !== 'undefined') ZoneSystem.resolve(sceneId, choiceIndex); 
   },
   go(screen, params) { Engine.go(screen, params); },
+  deathFinalize() { if (typeof DeathSystem !== 'undefined') DeathSystem.finalize(); },
   workJob(id) { if (typeof WorkSystem !== 'undefined') WorkSystem.apply(id); },
   buyOutfit(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.buy(id); },
   wearOutfit(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.wear(id); },
@@ -2414,7 +2446,7 @@ const Actions = {
   combatFinish() {
     const c = State.combat;
     if (!c) { Engine.go('city'); return; }
-    if (c.outcome === 'lose') { if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart(); return; }
+    if (c.outcome === 'lose') { if (typeof DeathSystem !== 'undefined') DeathSystem.fullRestart('Пуля. В этом городе пули быстрее слов.'); return; }
     const ctx = c.context || {};
     State.combat = null;
     Save.save();
