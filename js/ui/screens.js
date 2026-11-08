@@ -722,6 +722,7 @@ const Screens = {
     return `
       <h2>Работа</h2>
       <p class="muted">Легальный заработок. Без риска. Без крови. Почти.</p>
+      <p class="small muted">${(typeof CityRep !== 'undefined') ? CityRep.line("work") : ""}</p>
       <p class="small muted">Сегодня: ${today}/${max}. ${canWork ? '' : 'Организм просит отдыха.'}</p>
       <hr>
       ${WorkData.map(job => `
@@ -760,6 +761,7 @@ const Screens = {
     return `
       <h2>Бар</h2>
       <p class="muted">Дым, виски, тихие разговоры.</p>
+      <p class="small muted">${(typeof CityRep !== 'undefined') ? CityRep.line("bar") : ""}</p>
       <hr>
       <h3>Еда</h3>
       <p class="small">Еда: ${inv.food} · Вода: ${inv.water}</p>
@@ -1064,6 +1066,7 @@ const Screens = {
     return `
       <h2>Оружейный магазин</h2>
       <p class="muted small">«Что нужно?» — спрашивает продавец, не поднимая глаз. У него их два.</p>
+      <p class="small muted">${(typeof CityRep !== 'undefined') ? CityRep.line("shop") : ""}</p>
       <hr>
       <h3>Броня</h3>
       ${Weapons.armor.map(a => {
