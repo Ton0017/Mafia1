@@ -64,6 +64,7 @@ const Music = {
     }
     const buf = await this._loadBuffer(url);
     if (!buf) return;
+    if (!this.enabled) return; // Защита: если выключили, пока грузилось — не играем
     const src = this.ctx.createBufferSource();
     src.buffer = buf;
     src.loop = loop;
