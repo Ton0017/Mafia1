@@ -15,7 +15,7 @@ const Time = {
         this.onNewDay();
       }
       this.onHourTick();
-      if (!State.player || !State.city) return; // смерть посреди advance
+      if (!State.player || !State.city || State.deathRecord) return; // смерть посреди advance
     }
     Save.save();
     if (typeof Engine !== 'undefined') Engine.updateTopbar();
@@ -122,7 +122,7 @@ const Time = {
   },
 
   onNewDay() {
-    if (!State.player) return;
+    if (!State.player || State.deathRecord) return;
     if (!State.player.lifetime) State.player.lifetime = { kills: 0, moneyEarned: 0, missionsDone: 0, daysSurvived: 0, deaths: 0, overdoses: 0, breakdowns: 0 };
     if (!State.player.sanity) State.player.sanity = { sanity: 100, stress: 0, killsToday: 0, lastResetDay: 0, nightmares: 0 };
     if (!State.player.dependencies) State.player.dependencies = { nicotine: 0, alcohol: 0, stimulants: 0, opiates: 0 };

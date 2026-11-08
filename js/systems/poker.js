@@ -274,7 +274,7 @@ const Poker = {
     }
 
     Time.spend(0.5);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
