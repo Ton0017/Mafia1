@@ -253,8 +253,8 @@ const CasinoSystem = {
       State.player.casinoSession.gamesPlayed = (State.player.casinoSession.gamesPlayed || 0) + 1;
     }
     
-    // Игра за столом отнимает 30 минут
-    Time.spend(0.5);
+    // Игра за столом отнимает 5 минут (5 / 60 часа)
+    Time.spend(5 / 60);
     if (!State.player || !State.city || State.deathRecord) return;
     
     Save.save();
