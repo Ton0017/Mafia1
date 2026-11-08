@@ -707,6 +707,8 @@ const Combat = {
 
     // Убийство копа: сильный штраф к репутации, большой Heat
     if (c.context && c.context.type === 'cop') {
+      if (!State.flags) State.flags = {};
+      State.flags.killedCop = true;
       Economy.changeHeat(17, 'Убийство копа'); // +3 базовый +17 = +20 итого
       Economy.changeRep(-23, 'Убийство копа'); // -3 (базовый от копа) -20 (спец) = -23 итого
     }

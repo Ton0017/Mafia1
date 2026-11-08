@@ -105,44 +105,20 @@ const CopSystem = {
 
   // Арест
   surrender() {
-    Engine.log('— АРЕСТ —', 'bad');
-    Engine.log('Наручники щёлкают. Тебя ведут в участок. Всё, что было — конфисковано.', 'bad');
-
-    // #27: ставим флаг "в тюрьме", чтобы голод/жажда/раны не убили
-    if (!State.player.flags) State.player.flags = {};
-    State.player.flags.inJail = true;
-
-    // Восстанавливаем только стартовые вещи
-    const starterId = Weapons.starter(State.player.side);
-    State.player.money = 500;
-    if (!State.weapons) State.weapons = { owned: [], durability: {}, forSale: [] };
-    State.weapons.owned = [starterId];
-    State.player.currentWeaponId = starterId;
-    if (!State.weapons.durability) State.weapons.durability = {};
-    State.weapons.durability[starterId] = 100;
-    State.player.heat = 0;
-    if (!State.player.inventory) State.player.inventory = {};
-    State.player.inventory.ammo = {};
-    State.player.inventory.ammo.ammo_pistol = 60;
-
-    // Тело восстанавливается (тюрьма — это больница)
-    if (State.player.body) {
-      for (const part of Object.keys(State.player.body)) {
-        const bp = State.player.body[part];
-        if (bp && typeof bp.max === 'number') bp.hp = bp.max;
-      }
+    if (typeof JailSystem === 'undefined') {
+      Engine.log('Тюрьма недоступна.', 'warn');
+      return;
     }
-    State.player.conditions = (typeof defaultConditions === 'function') ? defaultConditions() : {};
-    State.player.diseases = [];
 
-    // Проходит 3 дня — с флагом inJail голод/жажда не убьют
-    Engine.log('Ты проводишь в камере три дня. Ничего не происходит. Только стены.', 'lore');
-    Time.advance(72); // 3 дня = 72 часа
+    const heat = State.player.heat || 0;
+    let days = 3;
+    if (heat >= 90) days = 5;
+    else if (heat >= 80) days = 4;
+    if (State.flags && State.flags.killedCop) {
+      days += 7;
+      delete State.flags.killedCop;
+    }
 
-    if (!State.player || !State.city) return;
-    State.player.flags.inJail = false;
-    Engine.log('Ты выходишь. На улице всё та же грязь. Но у тебя чистый лист.', 'lore');
-    Save.save();
-    Engine.go('city');
+    JailSystem.start(days);
   }
 };

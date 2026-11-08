@@ -65,6 +65,52 @@ const Screens = {
     `;
   },
 
+  jail() {
+    if (!State.player) return Engine.go('menu');
+    if (!State.jail) return Engine.go('city');
+    const cur = JailSystem.current();
+    if (!cur) {
+      State.jail = null;
+      Engine.go('city');
+      return '';
+    }
+
+    const dayNum = State.jail.index + 1;
+    const dayTotal = State.jail.scenes.length;
+    const sceneType = State.jail.scenes[State.jail.index].type;
+    const typeLabels = {
+      firstNight: 'КАМЕРА',
+      cellmate: 'СОКАМЕРНИК',
+      interrogation: 'ДОПРОС',
+      micro: 'БУДНИ',
+      release: 'ВЫХОД'
+    };
+    const label = typeLabels[sceneType] || 'ТЮРЬМА';
+
+    const nameHtml = cur.name ? `<p class="small gold" style="text-align:center;">${cur.name}</p>` : '';
+
+    const choicesHtml = cur.choices ? `
+      <hr>
+      <div class="row">
+        ${cur.choices.map((c, i) => Components.button(c.text, `Actions.jailChoose(${i})`, { primary: true })).join('')}
+      </div>
+    ` : `
+      <hr>
+      ${Components.button(sceneType === 'release' ? 'Выйти' : 'Дальше', 'Actions.jailNext()', { primary: true })}
+    `;
+
+    return `
+      <h2 style="text-align:center; letter-spacing:0.1em;">— ${label} —</h2>
+      <p class="small muted" style="text-align:center;">День ${dayNum} из ${dayTotal} · Срок: ${State.jail.days} ${State.jail.days === 1 ? 'день' : State.jail.days < 5 ? 'дня' : 'дней'}</p>
+      ${nameHtml}
+      <hr>
+      <div class="poker-table">
+        <p style="font-style:italic; margin:0.5rem 0;">${cur.text}</p>
+      </div>
+      ${choicesHtml}
+    `;
+  },
+
   create() {
     return `
       <h2>Новая жизнь</h2>
@@ -2223,6 +2269,8 @@ const Actions = {
   },
   go(screen, params) { Engine.go(screen, params); },
   deathFinalize() { if (typeof DeathSystem !== 'undefined') DeathSystem.finalize(); },
+  jailNext() { if (typeof JailSystem !== 'undefined') JailSystem.next(); },
+  jailChoose(i) { if (typeof JailSystem !== 'undefined') JailSystem.choose(i); },
   workJob(id) { if (typeof WorkSystem !== 'undefined') WorkSystem.apply(id); },
   buyOutfit(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.buy(id); },
   wearOutfit(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.wear(id); },

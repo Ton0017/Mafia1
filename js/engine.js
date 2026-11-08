@@ -3,6 +3,11 @@ const Engine = {
   params: {},
 
   go(screen, params = {}) {
+    // Тюрьма: пока все сцены не пройдены — только jail
+    if (typeof State !== 'undefined' && State.jail && screen !== 'jail') {
+      screen = 'jail';
+      params = {};
+    }
     this.screen = screen;
     this.params = params;
     this.render();
