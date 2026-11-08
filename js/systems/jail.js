@@ -102,16 +102,24 @@ const JailSystem = {
     if (!State.player || !State.jail) return;
     const days = State.jail.days;
 
-    // Сбрасываем тюрьму ДО течения времени
+    // Сбрасываем тюрьму ДО течения времени (чтобы не зациклить экран)
     State.jail = null;
-    State.player.flags.inJail = false;
-
+    
+    // ВАЖНО: флаг inJail оставляем включенным, чтобы голод не убил в камере!
     Time.advance(days * 24);
 
-    // Если игрок умер от истощения во время срока, экран смерти уже вызван.
-    // Останавливаемся, чтобы не перезаписать его экраном города.
+    // Если каким-то образом умерли (например, от события) - выходим
     if (!State.player || !State.city || State.deathRecord) {
       return;
+    }
+
+    // Теперь безопасно выключаем флаг тюрьмы
+    State.player.flags.inJail = false;
+    
+    // Даем немного еды и воды при выходе (в тюрьме кормят, хоть и баландой)
+    if (State.player.survival) {
+      State.player.survival.hunger = Math.max(State.player.survival.hunger || 0, 40);
+      State.player.survival.thirst = Math.max(State.player.survival.thirst || 0, 40);
     }
 
     Economy.changeRep(-5, 'Сидел. Город помнит.');
