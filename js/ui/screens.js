@@ -531,7 +531,14 @@ const Screens = {
             <p class="small muted">${item.desc}</p>
             <p class="small">Харизма: +${item.charisma} · Репутация: +${item.rep}</p>
             <div class="row tight">
-              ${worn ? '<span class="tag owner">Надето</span>' :
+              ${item.type === 'accessory' ? (() => {
+                const accOwned = (State.player.ownedAccessories || []).includes(item.id);
+                const accWorn = State.player.accessories && State.player.accessories[item.slot] === item.id;
+                return accWorn ? '<span class="tag owner">Надето</span>' :
+                  accOwned ? Components.button('Надеть', `Actions.equipAccessory('${item.id}')`, { primary: true }) :
+                  Components.button('Купить', `Actions.buyAccessory('${item.id}')`);
+              })() :
+                worn ? '<span class="tag owner">Надето</span>' :
                 has ? Components.button('Надеть', `Actions.wearOutfit('${item.id}')`, { primary: true }) :
                 Components.button('Купить', `Actions.buyOutfit('${item.id}')`)}
             </div>
@@ -1492,21 +1499,56 @@ const Screens = {
     const playerCards = Cards.showHand(s.playerHand);
     const playerStr = Cards.describe(s.playerHand);
 
-    if (s.stage === 'decide') {
+    let dealerHtml = '';
+    if (s.dealer) {
+      dealerHtml = `<p class="small muted">Дилер: ${s.dealer.name}. ${s.dealer.desc || ''}</p>`;
+    }
+
+    let communityHtml = '';
+    if (s.community && s.community.length > 0) {
+      communityHtml = `<div class="poker-table">
+        <div class="poker-table-label">Стол</div>
+        ${s.community.map(c => `<span class="pcard">${Cards.show(c)}</span>`).join('')}
+      </div>`;
+    }
+
+    let npcsHtml = '';
+    if (s.npcs && s.npcs.length > 0) {
+      npcsHtml = s.npcs.map(npc => {
+        const status = npc.folded ? 'СБРОСИЛ' :
+          npc.status === 'raised' ? 'ПОДНЯЛ' :
+          npc.status === 'called' ? 'УРАВНЯЛ' : 'ДУМАЕТ';
+        const line = npc.line && !npc.folded
+          ? `<p class="small muted" style="margin:4px 0 0 0; padding-left:8px; border-left:2px solid var(--line);">${npc.line}</p>`
+          : '';
+        return `<div class="poker-npc ${npc.folded ? 'folded' : ''}">
+          <div class="poker-npc-name">${npc.name}</div>
+          <div class="poker-npc-status">${status} · $${npc.bet}</div>
+          ${line}
+        </div>`;
+      }).join('');
+    }
+
+    if (s.stage === 'preflop' || s.stage === 'flop' || s.stage === 'turn' || s.stage === 'river') {
       return `
         <h2>Покерный стол</h2>
-        <p class="muted">Дым висит над столом. Дилер смотрит на тебя без эмоций.</p>
+        ${dealerHtml}
+        ${npcsHtml ? `<hr>${npcsHtml}` : ''}
         <hr>
-        <p class="small gold">Твои карты: <b style="font-size:1.4em; color:white">${playerCards}</b> <span class="muted">(${playerStr})</span></p>
-        <p class="small">Ставка: <b>$${Utils.fmtMoney(s.playerBet)}</b> · В кармане: <b>$${Utils.fmtMoney(State.player.money)}</b></p>
+        ${communityHtml}
+        <div class="poker-bank">Банк: $${Utils.fmtMoney(s.pot)}</div>
+        <p class="small muted" style="text-align:center;">Твоя ставка: $${Utils.fmtMoney(s.playerBet)} · В кармане: $${Utils.fmtMoney(State.player.money)}</p>
+        <div class="poker-table">
+          <div class="poker-table-label">Твои карты</div>
+          ${s.playerHand.map(c => `<span class="pcard">${Cards.show(c)}</span>`).join('')}
+        </div>
+        <p class="small muted" style="text-align:center;">${playerStr}</p>
         <hr>
-        <h3>Что делать?</h3>
         <div class="row">
           ${Components.button('Сбросить', 'Actions.pokerFold()', { danger: true })}
           ${Components.button('Уравнять (+$50)', 'Actions.pokerCall()', { primary: true })}
         </div>
-        <h3>Поднять ставку</h3>
-        <p class="small muted">От $${Poker.MIN_RAISE} до $${Poker.MAX_RAISE}. Не больше, чем у тебя в кармане.</p>
+        <p class="small muted">Поднять ставку: от $${Poker.MIN_RAISE} до $${Poker.MAX_RAISE}.</p>
         <div class="row">
           <input type="number" id="poker-raise" min="${Poker.MIN_RAISE}" max="${Poker.MAX_RAISE}" value="${Poker.MIN_RAISE}" style="max-width:8em; font-size:18px; background:#000; color:#fff; border:1px solid #555; padding:0.4rem;">
           ${Components.button('Поднять', 'Actions.pokerRaise()', { primary: true })}
@@ -1516,19 +1558,27 @@ const Screens = {
       `;
     }
 
-    // Результат
     let resultHeader = '';
-    if (s.result === 'win') resultHeader = '<h2 style="color:#6fa84f">Ты выиграл</h2>';
-    else if (s.result === 'lose') resultHeader = '<h2 style="color:#a32626">Ты проиграл</h2>';
+    if (s.result === 'win' || s.result === 'win_all_fold') resultHeader = '<h2>Ты выиграл</h2>';
+    else if (s.result === 'lose') resultHeader = '<h2>Ты проиграл</h2>';
     else resultHeader = '<h2>Сброс</h2>';
+
+    let showdownHtml = '';
+    if (s.community && s.community.length > 0) {
+      showdownHtml = `<p class="small">Стол: <b style="font-size:1.3em">${Cards.showHand(s.community)}</b></p>`;
+    }
 
     return `
       ${resultHeader}
       <hr>
-      <p class="small gold">Твои карты: <b style="font-size:1.3em">${playerCards}</b> (${playerStr})</p>
-      <p class="small">Карты дилера: <b style="font-size:1.3em">${Cards.showHand(s.dealerHand)}</b> (${Cards.describe(s.dealerHand)})</p>
+      ${showdownHtml}
+      <div class="poker-table">
+        <div class="poker-table-label">Твои карты</div>
+        ${s.playerHand.map(c => `<span class="pcard">${Cards.show(c)}</span>`).join('')}
+      </div>
+      <p class="small muted" style="text-align:center;">${playerStr}</p>
       <hr>
-      <p class="big ${(s.netGain || 0) >= 0 ? 'green' : 'red'}">${(s.netGain || 0) >= 0 ? '+' : ''}$${Utils.fmtMoney(s.netGain || 0)}</p>
+      <p class="big">${(s.netGain || 0) >= 0 ? '+' : ''}$${Utils.fmtMoney(s.netGain || 0)}</p>
       <p class="small">В кармане: $${Utils.fmtMoney(State.player.money)}</p>
       <hr>
       ${Components.button('Уйти из-за стола', 'Actions.pokerLeave()', { primary: true })}
@@ -1915,6 +1965,25 @@ const Screens = {
       `)}
       
       ${Components.card('Тело', Components.bodyBar(p.body))}
+
+      ${Components.card('Аксессуары', (() => {
+        const slots = [
+          ['watch', 'Часы'],
+          ['scent', 'Парфюм'],
+          ['glasses', 'Очки'],
+          ['lighter', 'Зажигалка'],
+          ['cane', 'Трость']
+        ];
+        const acc = p.accessories || {};
+        return slots.map(([slot, label]) => {
+          const id = acc[slot];
+          const item = id && typeof OutfitsData !== 'undefined' ? OutfitsData.findById(id) : null;
+          return `<div class="row" style="justify-content:space-between; margin-bottom:4px;">
+            <span class="small muted">${label}</span>
+            <span class="small">${item ? item.name + ' ' + Components.button('Снять', `Actions.equipAccessory('${item.id}')`) : '— пусто —'}</span>
+          </div>`;
+        }).join('');
+      })())}
       
       ${Components.card('Инвентарь (Расходники)', `
         ${(() => {
@@ -2098,6 +2167,8 @@ const Actions = {
   workJob(id) { if (typeof WorkSystem !== 'undefined') WorkSystem.apply(id); },
   buyOutfit(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.buy(id); },
   wearOutfit(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.wear(id); },
+  buyAccessory(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.buyAccessory(id); },
+  equipAccessory(id) { if (typeof OutfitsSystem !== 'undefined') OutfitsSystem.equipAccessory(id); },
   nightEnter(id) { if (typeof NightSystem !== 'undefined') NightSystem.enter(id); },
   nightDrink(id) { if (typeof NightSystem !== 'undefined') NightSystem.drinkNight(id); },
   nightDance(id) { if (typeof NightSystem !== 'undefined') NightSystem.dance(id); },
