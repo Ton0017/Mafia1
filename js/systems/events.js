@@ -48,6 +48,7 @@ const EventsSystem = {
     if (!eff) return false;
 
     this.applyEffect(eff);
+    if (State.deathRecord) return true; // Если умерли от эффекта, не идем в город
     ev.resolved = true;
     State.events.pending = State.events.pending.filter(e => e.id !== eventId);
     Save.save();
