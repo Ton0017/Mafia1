@@ -1682,12 +1682,12 @@ const Screens = {
         </div>
       `)}
       
-      ${(State.politics && State.politics.playerInfluence >= 50) ? `
+      ${(State.politics && State.politics.playerInfluence >= 60) ? `
         <div class="card hot">
           <p class="small gold">У тебя достаточно влияния (${State.politics.playerInfluence}), чтобы выдвинуть своего кандидата!</p>
-          ${Components.button('Выдвинуть своего мэра ($5000 + 50 Влияния)', 'Actions.promoteCandidate()', { primary: true })}
+          ${Components.button('Выдвинуть своего мэра ($30000 + 60 Влияния)', 'Actions.promoteCandidate()', { primary: true })}
         </div>
-      ` : `<p class="small muted">Для выдвижения своего мэра нужно 50 Влияния (у тебя: ${(State.politics && State.politics.playerInfluence) || 0}).</p>`}
+      ` : `<p class="small muted">Для выдвижения своего мэра нужно 60 Влияния (у тебя: ${(State.politics && State.politics.playerInfluence) || 0}).</p>`}
       <hr>
       <hr>
       ${Components.button('← В город', 'Actions.go("city")')}
@@ -1871,6 +1871,30 @@ const Screens = {
       <h2>Фракции</h2>
       <p class="muted small">Те, кто держит город. Или пытается.</p>
       <hr>
+      ${(() => {
+        // Войны и союзы
+        const lines = [];
+        const fs = (State.factions || []).filter(f => !f.isPolice);
+        for (let i = 0; i < fs.length; i++) {
+          for (let j = i + 1; j < fs.length; j++) {
+            const a = fs[i], b = fs[j];
+            const ab = (a.relations && a.relations[b.id]) || 0;
+            const ba = (b.relations && b.relations[a.id]) || 0;
+            const rel = Math.min(ab, ba);
+            if (rel <= -30) {
+              lines.push(`<p class="small" style="margin:3px 0;"><span class="gold">⚔</span> ${a.name} <span class="muted">против</span> ${b.name}</p>`);
+            } else if (rel >= 50) {
+              lines.push(`<p class="small" style="margin:3px 0;"><span class="gold">◆</span> ${a.name} <span class="muted">и</span> ${b.name} <span class="muted">— мир</span></p>`);
+            }
+          }
+        }
+        const allies = fs.filter(f => f.allyWithPlayer);
+        if (allies.length > 0) {
+          lines.push(`<p class="small" style="margin:3px 0;"><span class="gold">◆</span> Твои союзники: ${allies.map(f => f.name).join(', ')}</p>`);
+        }
+        if (lines.length === 0) return '';
+        return `<div class="poker-table"><div class="poker-table-label">Войны и союзы</div>${lines.join('')}</div>`;
+      })()}
       ${(State.factions || []).map(f => {
         const rel = (f.relations && f.relations.player) || 0;
         const relLabel = rel < -30 ? 'враждебно' : rel < 10 ? 'холодно' : rel > 40 ? 'тепло' : 'нейтрально';
@@ -2153,8 +2177,8 @@ const Actions = {
   lobbyBusiness() { if (typeof Politics !== 'undefined') Politics.lobbyBusiness(); },
   promoteCandidate() {
     if (typeof Politics === 'undefined') return;
-    const cost = 5000;
-    const reqInf = 50;
+    const cost = 30000;
+    const reqInf = 60;
     const inf = (State.politics && State.politics.playerInfluence) || 0;
     
     if (inf < reqInf) { Engine.log('Не хватает влияния (нужно ' + reqInf + ').', 'warn'); return; }

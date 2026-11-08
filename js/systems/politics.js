@@ -66,7 +66,7 @@ const Politics = {
     
     // Цена: $1000 + Heat * 30 + Level * 100
     if (!typeData) return;
-    let cost = 1000 + ((State.player.heat || 0) * 30) + ((State.player.level || 1) * 100);
+    let cost = 5000 + ((State.player.heat || 0) * 100) + ((State.player.level || 1) * 500);
     
     if (!Economy.spend(cost, 'Взятка мэру')) return;
 

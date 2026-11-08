@@ -171,7 +171,7 @@ const Faction = {
       defender.power = Math.min(10, (defender.power || 5) + 1);
       
       if (!State.city.news) State.city.news = [];
-      State.city.news.unshift(`🛡 ${defender.name} отбились от атаки ${attacker.name} в районе ${zone.name}. Охрана ослаблена.`);
+      State.city.news.unshift(`◆ ${defender.name} отбились от атаки ${attacker.name} в районе ${zone.name}. Охрана ослаблена.`);
       if (State.city.news.length > 5) State.city.news.pop();
     }
   },
@@ -226,8 +226,12 @@ const Faction = {
       faction.zones = (faction.zones || 0) + 1;
       faction.influence = (faction.influence || 0) + 1;
       
+      if (!State.city.news) State.city.news = [];
+      if (State.city.news.length > 5) State.city.news.pop();
+
       if (oldOwner === 'player') {
         Engine.log(faction.name + ' захватила ' + zone.name + '. Ты потерял зону.', 'bad');
+        State.city.news.unshift('⚔ ' + faction.name + ' выбила тебя из района ' + zone.name + '.');
         Economy.changeRep(-5);
         if (typeof Sanity !== 'undefined') Sanity.onBloodyEvent(2);
 
@@ -245,6 +249,7 @@ const Faction = {
         }
       } else {
         Engine.log(faction.name + ' захватила ' + zone.name + '.', 'info');
+        State.city.news.unshift('⚔ ' + faction.name + ' забрала ' + zone.name + ' у другой силы.');
       }
     }
   },
