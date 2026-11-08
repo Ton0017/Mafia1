@@ -61,7 +61,7 @@ const PoliceStation = {
     enemy.loot.money = (enemy.loot.money || 0) + Utils.rnd(100, 200) * count;
     Economy.changeHeat(30, 'Стрельба в участке');
     Time.spend(1);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Combat.start(enemy, { type: 'cop', returnScreen: 'city' });
   },
 
@@ -80,7 +80,7 @@ const PoliceStation = {
     Engine.log('Дежурный долго смотрит в картотеку. Потом отдаёт папку. Ты платишь. Он запоминает.', 'info');
     Engine.log(who, 'lore');
     Time.spend(1);
-    if (!State.player || !State.city) return false;
+    if (!State.player || !State.city || State.deathRecord) return false;
     Save.save();
     Engine.render();
     return true;
@@ -103,7 +103,7 @@ const PoliceStation = {
     }
 
     Time.spend(0.5);
-    if (!State.player || !State.city) return false;
+    if (!State.player || !State.city || State.deathRecord) return false;
     Save.save();
     Engine.render();
     return true;
@@ -118,7 +118,7 @@ const PoliceStation = {
     Engine.log('Ты просто сидишь. Никто не спрашивает, зачем ты здесь. Это и есть участок.', 'muted');
 
     Time.spend(2);
-    if (!State.player || !State.city) return false;
+    if (!State.player || !State.city || State.deathRecord) return false;
     Economy.changeRep(-1, 'Вас видели в участке');
     Save.save();
     Engine.render();

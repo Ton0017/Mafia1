@@ -34,7 +34,7 @@ const NightSystem = {
     if (State.player.dependencies) State.player.dependencies.alcohol = Math.min(100, (State.player.dependencies.alcohol || 0) + d.addiction);
     Engine.log(d.log, 'good');
     Time.spend(0.25);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
@@ -50,7 +50,7 @@ const NightSystem = {
     }
     Engine.log(d.log, 'good');
     Time.spend(d.id === 'take_home' ? 4 : 0.5);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
@@ -65,6 +65,7 @@ const NightSystem = {
       if (State.player.sanity) State.player.sanity.sanity = Math.min(100, (State.player.sanity.sanity || 0) + 5);
     }
     Time.spend(0.25);
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
@@ -78,7 +79,7 @@ const NightSystem = {
     Engine.log(drug.log, 'bad');
     if (typeof Drugs !== 'undefined') Drugs.use(drugId);
     Time.spend(0.25);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
@@ -96,7 +97,7 @@ const NightSystem = {
         }
         Engine.log('Копы! Ты выпрыгиваешь в окно и бежишь.', 'bad');
         Time.spend(1);
-        if (!State.player || !State.city) return;
+        if (!State.player || !State.city || State.deathRecord) return;
         Save.save();
         Engine.go('city');
         return;
@@ -145,7 +146,7 @@ const NightSystem = {
     Engine.log('Бонус: ' + bonusLabel, 'info');
 
     Time.spend(0.5);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
@@ -157,7 +158,7 @@ const NightSystem = {
     if (!Economy.spend(item.price, 'Рынок: ' + item.name)) return;
     Engine.log('Ты покупаешь «' + item.name + '». ' + item.desc, 'good');
     Time.spend(0.5);
-    if (!State.player || !State.city) return;
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.render();
   },
