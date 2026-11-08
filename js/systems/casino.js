@@ -100,6 +100,8 @@ const CasinoSystem = {
       State.player.sanity.stress = Math.max(0, (State.player.sanity.stress || 0) - 50);
     }
     Engine.log('Ты проводишь ночь с ' + npc.name + '. Мир становится чуть мягче.', 'good');
+    if (!State.flags) State.flags = {};
+    State.flags.showSexScene = true;
     Time.spend(4, 'Ночь с ' + npc.name);
     if (!State.player || !State.city) return;
     Save.save();

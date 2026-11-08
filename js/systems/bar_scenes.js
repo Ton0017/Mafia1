@@ -72,7 +72,7 @@ const BarSystem = {
         const rumorZone = Utils.pick(State.zones);
         State.quests.available.push({ id: 'q_rumor_' + Utils.uid(), type: 'social', title: 'Слух из бара', desc: 'Информация, которую ты купил.', zoneId: rumorZone.id, zoneName: rumorZone.name, giverName: 'Женщина в красном', duration: 2, risk: 0.2, reward: { money: 400, xp: 50, rep: 5 }, daily: false, createdDay: State.time.day });
       }
-    } else if (choice.action === 'heal_sanity') { Economy.spend(choice.value, 'Ночь с женщиной'); Sanity.onSex(); }
+    } else if (choice.action === 'heal_sanity') { Economy.spend(choice.value, 'Ночь с женщиной'); Sanity.onSex(); if (!State.flags) State.flags = {}; State.flags.showSexScene = true; }
     else if (choice.action === 'heal_hp') {
       if (!State.player || !State.player.body) return;
       if (!State.player.inventory) State.player.inventory = {};

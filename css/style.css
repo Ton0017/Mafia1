@@ -288,6 +288,7 @@ input[type="text"]:focus { outline: 0; border-color: var(--white); }
 
 /* ═══ СПРАЙТЫ ═══ */
 .sprite {
+  object-fit: contain;
   image-rendering: pixelated;
   filter: grayscale(100%) contrast(1.3) brightness(0.95);
   border: 2px solid #4a4a4a;
@@ -580,4 +581,23 @@ button, #topbar, .log-entry, .card, h1, h2, h3 {
   margin: 1rem auto;
   border: 2px solid var(--white);
   background: #000;
+}
+
+/* ─── BACKGROUNDS ────────────────────────── */
+.city-bg {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-bottom: 2px solid var(--white);
+  height: 180px;
+  margin: 0 0 1rem 0;
+  position: relative;
+  filter: grayscale(100%) contrast(1.2);
+}
+.city-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(to top, var(--black), transparent);
 }

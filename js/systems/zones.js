@@ -94,6 +94,7 @@ const ZonesSystem = {
 
     Engine.log(merc.name + ' отправился захватить ' + zone.name + ' (' + duration + 'ч).', 'info');
     Time.spend(0.5);
+    if (!State.player || !State.city || State.deathRecord) return;
     Save.save();
     Engine.go('myZones');
     return true;

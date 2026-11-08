@@ -1747,15 +1747,8 @@ const Screens = {
     if (!State.player) return '<p class="red">Нет игрока.</p>';
     const girls = WomenData.getAll();
     
-    let sexSceneHtml = '';
-    if (State.flags && State.flags.showSexScene) {
-      sexSceneHtml = `<img src="assets/sprites/sex_scene.jpg" class="scene-img" alt="Ночь">`;
-      State.flags.showSexScene = false; // Показываем картинку только один раз
-    }
-
     return `
       <h2>Женщины</h2>
-      ${sexSceneHtml}
       <p class="muted">В нуарном городе женщины опаснее пуль.</p>
       <hr>
       ${girls.map(g => {
@@ -2337,6 +2330,13 @@ const Actions = {
   policeBribe() { if (typeof PoliceStation !== 'undefined') PoliceStation.bribeDesk(); },
   policeSit() { if (typeof PoliceStation !== 'undefined') PoliceStation.sit(); },
   policeSurrender() { if (typeof PoliceStation !== 'undefined') PoliceStation.surrender(); },
+  personalEnemyAction(id, action) {
+    if (typeof PersonalEnemies === 'undefined') return;
+    if (action === 'pay') PersonalEnemies.pay(id);
+    else if (action === 'fight') PersonalEnemies.fight(id);
+    else if (action === 'flee') PersonalEnemies.flee(id);
+    else if (action === 'talk') PersonalEnemies.talk(id);
+  },
   deathFinalize() { if (typeof DeathSystem !== 'undefined') DeathSystem.finalize(); },
   jailNext() { if (typeof JailSystem !== 'undefined') JailSystem.next(); },
   jailChoose(i) { if (typeof JailSystem !== 'undefined') JailSystem.choose(i); },

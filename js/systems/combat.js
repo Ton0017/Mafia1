@@ -722,5 +722,10 @@ const Combat = {
     if (c.context && c.context.type === 'zoneCapture' && typeof ZonesSystem !== 'undefined') {
       ZonesSystem.onFactionZoneCapture(c.context.zoneId, c.context.factionId);
     }
+
+    // Личный враг: убит
+    if (c.context && c.context.type === 'personal_enemy' && c.context.enemyId && typeof PersonalEnemies !== 'undefined') {
+      PersonalEnemies.resolveByCombat(c.context.enemyId, 'win');
+    }
   },
 };

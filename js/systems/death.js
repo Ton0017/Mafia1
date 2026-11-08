@@ -1,5 +1,6 @@
 const DeathSystem = {
   fullRestart(reason) {
+    if (typeof Music !== 'undefined' && Music.stop) Music.stop();
     const p = State.player;
     if (!p) {
       Save.wipe();

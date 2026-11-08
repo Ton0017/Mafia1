@@ -101,12 +101,18 @@ const JailSystem = {
   finish() {
     if (!State.player || !State.jail) return;
     const days = State.jail.days;
-    const choicesMade = State.jail.choices.slice();
 
+    // Сбрасываем тюрьму ДО течения времени
+    State.jail = null;
     State.player.flags.inJail = false;
 
     Time.advance(days * 24);
-    if (!State.player || !State.city) { State.jail = null; return; }
+
+    // Если игрок умер от истощения во время срока, экран смерти уже вызван.
+    // Останавливаемся, чтобы не перезаписать его экраном города.
+    if (!State.player || !State.city || State.deathRecord) {
+      return;
+    }
 
     Economy.changeRep(-5, 'Сидел. Город помнит.');
 
@@ -120,8 +126,6 @@ const JailSystem = {
         Engine.log('Пока ты сидел, ' + lost.name + ' отошла. Не к кому-то. Просто отошла.', 'bad');
       }
     }
-
-    State.jail = null;
 
     Engine.log('Ты выходишь. На улице всё та же грязь. Но у тебя чистый лист. Пока.', 'lore');
     Save.save();
